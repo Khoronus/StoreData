@@ -1,0 +1,5 @@
+CMake References
+https://github.com/Crascit/DownloadProject
+
+zlib
+https://zlib.net/

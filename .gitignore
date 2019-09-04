@@ -1,0 +1,9 @@
+# Ignore all the folders with name
+build/
+
+# Ignore specific files (created locally)
+configure/path_configuration.txt
+configure/win/build_result.txt
+module/core/storedata_defines.hpp
+module/version/version.hpp
+module/record/inc/record/lib_configuration.hpp
