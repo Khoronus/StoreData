@@ -126,9 +126,9 @@ int main(int argc, char *argv[], char *window_name)
 		record();
 		// Record a video and save some simple data
 		storedata::PlayerRecorder pr;
-		pr.play("data\\record_2018-12-07.08_20_38.dat", 60);
+		pr.play("data\\record_2019_10_04_01_00_28.dat", 60);
 		unsigned int index_start = 0;
-		pr.unpack("data\\record_2018-12-07.08_20_38.dat", 60, "unpack\\", index_start);
+		pr.unpack("data\\record_2019_10_04_01_00_28.dat", 60, "unpack\\", index_start);
 	}
 
 	// record a video with a raw data saver

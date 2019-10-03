@@ -39,6 +39,7 @@ void RawRecorder::setup(const std::string &filename,
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::record(uint8_t* data, size_t len) {
+	if (fgm_.under_writing()) return;
 	// Add the information to transmit
 	size_t size_msg_data = len;
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -56,6 +57,7 @@ void RawRecorder::record(uint8_t* data, size_t len) {
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::record(const std::vector<uint8_t> &data) {
+	if (fgm_.under_writing()) return;
 	// Add the information to transmit
 	size_t size_msg_data = data.size();
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -73,7 +75,7 @@ void RawRecorder::record(const std::vector<uint8_t> &data) {
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::record(const std::string &msg) {
-
+	if (fgm_.under_writing()) return;
 	// Add the information to transmit
 	size_t size_msg_data = msg.size();
 	std::vector<char> info_to_transmit(size_msg_data);
