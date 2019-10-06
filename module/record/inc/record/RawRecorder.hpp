@@ -61,6 +61,8 @@ public:
 	STOREDATA_RECORD_EXPORT void record(const std::string &msg);
 	STOREDATA_RECORD_EXPORT void record(const std::vector<uint8_t> &data);
 	STOREDATA_RECORD_EXPORT void record(uint8_t* data, size_t len);
+	template <typename _Ty>
+	STOREDATA_RECORD_EXPORT void record_t(_Ty data, size_t len);
 
 	STOREDATA_RECORD_EXPORT void play(const std::string &filename, int FPS);
 	STOREDATA_RECORD_EXPORT void play_raw(const std::string &filename, int FPS);
@@ -81,6 +83,10 @@ private:
 	std::map<int, FileGeneratorParams> fgp_;
 
 	/** @brief It reads the recorded data
+
+		It extracts all the objects pushed in the record
+		the data size information is dropped and it is
+		possible to extract from the vector size.
 	*/
 	void data2data_type(char *data, int maxsize, 
 		std::vector< std::vector<uint8_t> > &out);
@@ -88,5 +94,13 @@ private:
 };
 
 } // namespace storedata
+
+//#include "RawRecorder.inl"
+
+//// explicit instantiation
+//template void storedata::RawRecorder::record_t<uint8_t*>;
+//template STOREDATA_RECORD_EXPORT storedata::RawRecorder::record_t<const uint8_t*>;
+//template STOREDATA_RECORD_EXPORT storedata::RawRecorder::record_t<int8_t*>;
+//template STOREDATA_RECORD_EXPORT storedata::RawRecorder::record_t<const int8_t*>;
 
 #endif  // STOREDATA_RECORD_RAWRECORDER_HPP__

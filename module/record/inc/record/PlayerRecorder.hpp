@@ -37,7 +37,8 @@
 namespace storedata
 {
 
-// ----------------------------------------------------------------------------
+/** @brief Class to record/play RGB data
+*/
 class PlayerRecorder
 {
 public:

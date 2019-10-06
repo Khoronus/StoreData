@@ -1,0 +1,19 @@
+Important. All the memory is copied.
+> RawRecorder
+ It records raw data.
+> PlayerRecorder
+ It records/plays videos in avi/binary format.
+> FileGeneratorManagerAsync
+ Core class to generate files.
+> VideoGeneratorManager
+ Core class to generate videos.
+> EnhanceAsyncRecorderManager
+ Wrapper of the PlayerRecord. It encodes images and message in a same frame and it creates a video (avi) or binary file (dat, data).
+> RecordContainerData
+ Asynchronous recorder for files with raw binary data.
+
+
+TODO
+> Object memory should be shared. Clone should be optional.
+> Raw recorder should allow the serialization.
+> Microbuffer and volatile should be template and not a fix object (pair <string, cv::Mat>)

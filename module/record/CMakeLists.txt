@@ -14,7 +14,7 @@ endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 
 MACRO(HEADER_DIRECTORIES return_list)
-    FILE(GLOB_RECURSE new_list *.hpp *.cpp)
+    FILE(GLOB_RECURSE new_list *.hpp *.cpp *.inl)
     SET(dir_list "")
     FOREACH(file_path ${new_list})
         GET_FILENAME_COMPONENT(dir_path ${file_path} PATH)
@@ -31,7 +31,7 @@ SET( PROJ_OUT_PATH  ${CMAKE_BINARY_DIR} )
 
 #Add the files
 FILE( GLOB_RECURSE PROJ_SOURCES *.cpp *.cc *.c)
-FILE( GLOB_RECURSE PROJ_HEADERS *.hpp *.h)
+FILE( GLOB_RECURSE PROJ_HEADERS *.hpp *.h *.inl)
 
 set(PROJ_RETURNLIST "")
 HEADER_DIRECTORIES(PROJ_RETURNLIST)

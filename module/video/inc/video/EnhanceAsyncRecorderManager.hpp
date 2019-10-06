@@ -35,7 +35,8 @@
 namespace storedata
 {
 
-/** @brief Class to perform an async record
+/** @brief Class to perform an async record of image sources and data 
+           information as encoded image.
 */
 class EnhanceAsyncRecorderManager {
 public:

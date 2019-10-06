@@ -25,8 +25,8 @@ SET( MAIN_PROJ_NAME      "StoreData" )
 project (${MAIN_PROJ_NAME})
 
 set(STOREDATA_VERSION_MAJOR 0 CACHE STRING "major version of storedata" FORCE)
-set(STOREDATA_VERSION_MINOR 8 CACHE STRING "minor version of storedata" FORCE)
-set(STOREDATA_VERSION_SUBMINOR 2 CACHE STRING "subminor version of storedata" FORCE)
+set(STOREDATA_VERSION_MINOR 9 CACHE STRING "minor version of storedata" FORCE)
+set(STOREDATA_VERSION_SUBMINOR 0 CACHE STRING "subminor version of storedata" FORCE)
 set(STOREDATA_VERSION_PATCH 0 CACHE STRING "patch version of storedata" FORCE)
 set(STOREDATA_VERSION "${STOREDATA_VERSION_MAJOR}.${STOREDATA_VERSION_MINOR}.${STOREDATA_VERSION_SUBMINOR}.${STOREDATA_VERSION_PATCH}"
                              CACHE STRING "version of storedata" FORCE)
@@ -84,7 +84,7 @@ SET(BOOST_LIBRARYDIR ${path_boost_lib})
 set(Boost_USE_STATIC_LIBS        ON) # only find static libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost REQUIRED COMPONENTS system thread regex filesystem date_time)
+find_package(Boost REQUIRED COMPONENTS system thread regex filesystem date_time serialization)
 message("Boost_LIBRARY_DIR: " ${Boost_LIBRARIES})
 
 ######################################################################

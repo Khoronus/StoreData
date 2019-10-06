@@ -64,6 +64,8 @@ void PlayerRecorder::setup_metaframe(cv::Mat &meta_frame) {
 // ----------------------------------------------------------------------------
 void PlayerRecorder::record(cv::Mat &curr, bool encoded, std::string &msg) {
 
+	if (fgm_.under_writing()) return;
+
 	// Container with the buffer data of the encoded image.
 	std::vector< std::vector< uchar > > v_buffer_;
 
@@ -122,6 +124,8 @@ void PlayerRecorder::record(
 	unsigned char *msg, 
 	size_t msg_size) {
 
+	if (fgm_.under_writing()) return;
+
 	// Container with the buffer data of the encoded image.
 	std::vector< std::vector< uchar > > v_buffer_;
 
@@ -155,6 +159,7 @@ void PlayerRecorder::record(
 
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
+	// The size of the data header.
 	int imagedatasize_bytes = 24; // IT MUST BE SAME LATER
 								  // Cols, Rows, Channels, Data size, Message size
 	m_data[0] = std::vector<char>(size_img_data + size_msg_data +

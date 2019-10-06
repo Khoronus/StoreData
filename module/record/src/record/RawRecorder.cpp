@@ -92,6 +92,25 @@ void RawRecorder::record(const std::string &msg) {
 	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
+template <typename _Ty>
+void RawRecorder::record_t(_Ty data, size_t len) {
+	if (fgm_.under_writing()) return;
+	// Add the information to transmit
+	size_t size_msg_data = len;
+	std::vector<char> info_to_transmit(size_msg_data);
+	memcpy(&info_to_transmit[0], data, size_msg_data);
+
+	// Prepare the container for the data to transmit
+	std::map<int, std::vector<char> > m_data;
+	m_data[0] = std::vector<char>(size_msg_data + 4);
+
+	// Copy the data
+	memcpy(&m_data[0][0], &size_msg_data, sizeof(int));
+	memcpy(&m_data[0][4], &info_to_transmit[0],
+		size_msg_data);
+	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+}
+// ----------------------------------------------------------------------------
 void RawRecorder::play(const std::string &filename, int FPS) {
 	int _FPS = (std::max)(1, FPS);
 	// Read the data
@@ -134,6 +153,9 @@ void RawRecorder::play_raw(const std::string &filename, int FPS) {
 		std::ios::in | std::ios::binary | std::ios::ate);
 	int size = 0;
 	char *memblock = nullptr;
+	// it extracts all the objects pushed in the record
+	// the data size information is dropped and it is
+	// possible to extract from the vector size.
 	std::vector< std::vector<uint8_t> > data_info;
 	if (file.is_open())
 	{
@@ -268,12 +290,12 @@ void RawRecorder::data2data_type(char *data, int maxsize,
 		pos += 4;
 		if (msgsize < maxsize)
 		{
-			std::vector< uchar > msg_tmp(msgsize);
+			std::vector<uint8_t> msg_tmp(msgsize);
 			memcpy(&msg_tmp[0], &data[pos], msgsize);
-			std::vector<uint8_t> v(msgsize);
-			for (int i = 0; i < msgsize; i++)
-				v[i] = msg_tmp[i];
-			out.push_back(v);
+			//std::vector<uint8_t> v(msgsize);
+			//for (int i = 0; i < msgsize; i++)
+			//	v[i] = msg_tmp[i];
+			out.push_back(msg_tmp);
 		}
 		pos += msgsize;
 	}
@@ -285,3 +307,10 @@ void RawRecorder::set_callback_createfile(
 }
 
 } // namespace storedata
+
+// explicit instantiation
+template STOREDATA_RECORD_EXPORT void storedata::RawRecorder::record_t<uint8_t*>(uint8_t*, size_t);
+template STOREDATA_RECORD_EXPORT void storedata::RawRecorder::record_t<char*>(char*, size_t);
+template STOREDATA_RECORD_EXPORT void storedata::RawRecorder::record_t<const char*>(const char*, size_t);
+
+

@@ -68,9 +68,9 @@ void CodifyImage::image2string(cv::Mat &m, int &x, int &y, int k, int offset,
 	std::string &msg_out) {
 	size_t len = 0;
 	std::vector<uint8_t> msg_size(sizeof(len)); /*space must be allocated at this point*/
-	image2buffer(sizeof(size_t), m, x, y, k, offset, &msg_size[0], msg_size.size());
+	image2buffer(sizeof(len), m, x, y, k, offset, &msg_size[0], msg_size.size());
 	// convert back the chars in a int value
-	memcpy(&len, &msg_size[0], sizeof(size_t));
+	memcpy(&len, &msg_size[0], sizeof(len));
 	if (len < 0) return;
 	//std::cout << "len: " << len << std::endl;
 	// extract the message

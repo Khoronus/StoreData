@@ -58,7 +58,7 @@ int record() {
 		vc >> curr;
 		if (curr.empty()) continue;
 
-		std::string msg = "mpiv 4.04 5.05 6.06 7.07|miyuka 1.01 2.02 3.03";
+		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
 		pr.record(curr, 1, msg);
 
 		////////////////////////////////// Elaboration ////////////////////////////////////////
@@ -86,8 +86,8 @@ int record2() {
 		vc >> curr;
 		if (curr.empty()) continue;
 
-		//std::string msg = "mpiv 4.04 5.05 6.06 7.07|miyuka 1.01 2.02 3.03";
-		std::string msg = "mpiv 4.04 5.05 6.06 7.07|miyuka 1.01 2.02 " + std::to_string((float)rand() / RAND_MAX);
+		//std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
+		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 " + std::to_string((float)rand() / RAND_MAX);
 		pr.record(msg);
 
 		////////////////////////////////// Elaboration ////////////////////////////////////////
@@ -117,7 +117,7 @@ int record3() {
 		vc >> curr;
 		if (curr.empty()) continue;
 
-		//std::string msg = "mpiv 4.04 5.05 6.06 7.07|miyuka 1.01 2.02 3.03";
+		//std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
 		//pr.record(curr, 1, msg);
 
 		sources[0] = curr;
