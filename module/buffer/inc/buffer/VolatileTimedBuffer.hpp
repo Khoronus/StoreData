@@ -69,19 +69,32 @@ public:
 	*/
 	STOREDATA_BUFFER_EXPORT void create();
 
+	///** @brief It adds a new frame to the current container.
+
+	//	It adds a new frame to the current container. If there is no space,
+	//	it drops the data.
+	//*/
+	//STOREDATA_BUFFER_EXPORT bool add(double timestamp, 
+	//	const std::string &fname, const cv::Mat &m);
+
+	///** @brief It adds a new frame to the current container. If there is no
+	//           space, it creates a new buffer.
+	//*/
+	//STOREDATA_BUFFER_EXPORT bool add_forceexpand(double timestamp, const std::string &fname,
+	//	const cv::Mat &m);
+
 	/** @brief It adds a new frame to the current container.
 
 		It adds a new frame to the current container. If there is no space,
 		it drops the data.
 	*/
-	STOREDATA_BUFFER_EXPORT bool add(double timestamp, 
-		const std::string &fname, const cv::Mat &m);
+	STOREDATA_BUFFER_EXPORT bool add(double timestamp,
+		const std::shared_ptr<MicroBufferObjBase> &obj);
 
 	/** @brief It adds a new frame to the current container. If there is no
-	           space, it creates a new buffer.
+			   space, it creates a new buffer.
 	*/
-	STOREDATA_BUFFER_EXPORT bool add_forceexpand(double timestamp, const std::string &fname,
-		const cv::Mat &m);
+	STOREDATA_BUFFER_EXPORT bool add_forceexpand(double timestamp, const std::shared_ptr<MicroBufferObjBase> &obj);
 
 	/** @brief It gets the pointer to the container requested.
 

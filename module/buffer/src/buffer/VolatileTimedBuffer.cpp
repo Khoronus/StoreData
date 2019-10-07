@@ -63,16 +63,48 @@ void VolatileTimedBuffer::create() {
 	macro_container_.push_back(PtrMicrobuffer(new Microbuffer));
 	container_ = macro_container_.back();
 }
+////-----------------------------------------------------------------------------
+//bool VolatileTimedBuffer::add(double timestamp, const std::string &fname,
+//	const cv::Mat &m) {
+//	if (!container_) {
+//		//std::cout << "SmallBuffer::add" << std::endl;
+//		create();
+//	}
+//	if (current_id_ < container_->size()) {
+//		(*container_)[current_id_++] =
+//			std::make_pair(timestamp, std::make_pair(fname, m.clone()));
+//		return true;
+//	} /*else {
+//		std::cout << "SmallBuffer::add: Drop frame" << std::endl;
+//	}*/
+//	return false;
+//}
+////-----------------------------------------------------------------------------
+//bool VolatileTimedBuffer::add_forceexpand(double timestamp, 
+//	const std::string &fname, const cv::Mat &m) {
+//	if (!container_) {
+//		//std::cout << "SmallBuffer::add" << std::endl;
+//		create();
+//	}
+//	if (current_id_ < container_->size()) {
+//		(*container_)[current_id_++] =
+//			std::make_pair(timestamp, std::make_pair(fname, m.clone()));
+//		return true;
+//	} else {
+//		create();
+//		return add(timestamp, fname, m);
+//	}
+//	return false;
+//}
 //-----------------------------------------------------------------------------
-bool VolatileTimedBuffer::add(double timestamp, const std::string &fname,
-	const cv::Mat &m) {
+bool VolatileTimedBuffer::add(double timestamp, const std::shared_ptr<MicroBufferObjBase> &obj) {
 	if (!container_) {
 		//std::cout << "SmallBuffer::add" << std::endl;
 		create();
 	}
 	if (current_id_ < container_->size()) {
 		(*container_)[current_id_++] =
-			std::make_pair(timestamp, std::make_pair(fname, m.clone()));
+			std::make_pair(timestamp, obj);
 		return true;
 	} /*else {
 		std::cout << "SmallBuffer::add: Drop frame" << std::endl;
@@ -80,19 +112,18 @@ bool VolatileTimedBuffer::add(double timestamp, const std::string &fname,
 	return false;
 }
 //-----------------------------------------------------------------------------
-bool VolatileTimedBuffer::add_forceexpand(double timestamp, const std::string &fname,
-	const cv::Mat &m) {
+bool VolatileTimedBuffer::add_forceexpand(double timestamp, const std::shared_ptr<MicroBufferObjBase> &obj) {
 	if (!container_) {
 		//std::cout << "SmallBuffer::add" << std::endl;
 		create();
 	}
 	if (current_id_ < container_->size()) {
 		(*container_)[current_id_++] =
-			std::make_pair(timestamp, std::make_pair(fname, m.clone()));
+			std::make_pair(timestamp, obj);
 		return true;
 	} else {
 		create();
-		return add(timestamp, fname, m);
+		return add(timestamp, obj);
 	}
 	return false;
 }

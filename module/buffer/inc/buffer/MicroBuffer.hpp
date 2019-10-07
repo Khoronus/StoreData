@@ -35,9 +35,33 @@
 namespace vb
 {
 
+///** @brief Container with pair of timestamp, image
+//*/
+//typedef std::array<std::pair<double, std::pair<std::string, cv::Mat> >, 10> Microbuffer;
+///** @brief Shared memory for multiple micro-containers. When nothing point to 
+//    them, they are destroyed.
+//*/
+//typedef std::shared_ptr<Microbuffer> PtrMicrobuffer;
+
+
+
+/** @brief Base class to buffer objects.
+*/
+class MicroBufferObjBase
+{
+public:
+	MicroBufferObjBase() {}
+
+	virtual void clone(MicroBufferObjBase &obj) {};
+	/** @brief Access to the data that is collected in the derived class.
+	*/
+	virtual void* get_item(int id) {
+		return nullptr; }
+};
+
 /** @brief Container with pair of timestamp, image
 */
-typedef std::array<std::pair<double, std::pair<std::string, cv::Mat> >, 10> Microbuffer;
+typedef std::array<std::pair<double, std::shared_ptr<MicroBufferObjBase> >, 10> Microbuffer;
 /** @brief Shared memory for multiple micro-containers. When nothing point to 
     them, they are destroyed.
 */

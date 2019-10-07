@@ -33,6 +33,46 @@
 #include "buffer/buffer_headers.hpp"
 #include "record/record_headers.hpp"
 
+class MicroBufferObjDerived : public vb::MicroBufferObjBase
+{
+public:
+	MicroBufferObjDerived() {}
+	MicroBufferObjDerived(const std::string &msg, const cv::Mat &img) {
+		msg_ = msg;
+		img_ = img;
+	}
+
+	virtual void clone(MicroBufferObjDerived&obj) {
+		obj.set_img(img_);
+		obj.set_msg(msg_);
+	};
+	template <typename _Ty>
+	_Ty& get_item(int id) {
+		if (id == 0) return static_cast<_Ty>(msg_);
+		if (id == 1) return static_cast<_Ty>(img_);
+		return nullptr;
+	}
+
+	void set_msg(const std::string &msg) {
+		msg_ = msg;
+	}
+	std::string& msg() {
+		return msg_;
+	}
+
+	void set_img(const cv::Mat &img) {
+		img_ = img;
+	}
+	cv::Mat& img() {
+		return img_;
+	}
+
+private:
+
+	std::string msg_;
+	cv::Mat img_;
+};
+
 // ----------------------------------------------------------------------------
 namespace
 {
@@ -69,7 +109,8 @@ void test_record() {
 	cv::Mat src(50, 50, CV_8UC3, cv::Scalar(0, 255, 0));
 	// Add in the secondary buffer only if the current frame is not
 	// required to be saved
-	small_buffer[id].add_forceexpand(t_internal, fname, src);
+	small_buffer[id].add_forceexpand(t_internal, 
+		std::make_shared<MicroBufferObjDerived>(MicroBufferObjDerived(fname, src)));
 
 	// Clean size of the frame expire
 	small_buffer[id].clean(t_internal, save_frame_expire_time_sec);
