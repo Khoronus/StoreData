@@ -62,6 +62,13 @@ public:
 		float t,
 		const unsigned char *raw_data,
 		size_t raw_data_size);
+	/** @brief It records a data with the option to clone the source.
+	*/
+	STOREDATA_VIDEO_EXPORT EARM record(
+		const cv::Mat &img, bool do_clone,
+		float t,
+		const unsigned char *raw_data,
+		size_t raw_data_size);
 
 	STOREDATA_VIDEO_EXPORT bool is_object_initialized();
 

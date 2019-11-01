@@ -207,6 +207,141 @@ EnhanceAsyncRecorderManager::EARM EnhanceAsyncRecorderManager::record(
 	return EARM_BUSY;
 }
 // ----------------------------------------------------------------------------
+EnhanceAsyncRecorderManager::EARM EnhanceAsyncRecorderManager::record(
+	const cv::Mat &img, bool do_clone,
+	float t,
+	const unsigned char *raw_data,
+	size_t raw_data_size)
+{
+	if (!is_object_initialized_) return EARM_ERROR;
+
+	// Set the first frame size
+	if (size_first_frame_.width == 0 ||
+		size_first_frame_.height == 0) {
+		size_first_frame_ = img.size();
+	}
+	// If the size mismatch, stop the recording
+	if (size_first_frame_ != img.size()) return EARM_ERROR;
+
+	// processed the previous frame
+	if (done_) {
+		done_ = false;
+		memcpy(raw_data_, raw_data, raw_data_size);
+		raw_data_size_ = raw_data_size;
+		if (do_clone) {
+			processed_srcs_ = img.clone();
+		} else {
+			processed_srcs_ = img;
+		}
+		// record on a separated thread
+		std::thread t_player_recorder_(
+			[this]() {
+
+			bool do_record_internal = true;
+
+			// copy a scaled source
+			cv::Mat tmp;
+			cv::resize(processed_srcs_, tmp,
+				cv::Size(processed_srcs_.cols * source_scale_,
+					processed_srcs_.rows * source_scale_));
+
+			// calculates a timestamp
+			std::string timestamp =
+				storedata::DateTime::get_date_as_string() +
+				" " + std::to_string(cv::getTickCount());
+			// record the data
+			size_t timestamp_size = timestamp.size();
+			//unsigned char msg[2048];
+			//memcpy(msg, raw_data_, raw_data_size_);
+			//memcpy(&msg[raw_data_size_], &timestamp[0], timestamp_size);
+			//msg[raw_data_size_ + timestamp_size] = '\0';
+
+
+			memcpy(&shared_buffer_.get()[0], raw_data_, raw_data_size_);
+			memcpy(&shared_buffer_.get()[raw_data_size_], &timestamp[0], timestamp_size);
+			shared_buffer_.get()[raw_data_size_ + timestamp_size] = '\0';
+
+			// record video with encoded message
+			if (do_save_avi_) {
+				// record the video
+				if (m_data_block_.empty()) {
+					storedata::codify::CodifyImage::estimate_data_size(tmp,
+						msg_len_max_bytes_, data_block_size_,
+						data_block_offset_, m_data_block_);
+				}
+				// clean the data block
+				m_data_block_ = cv::Scalar::all(0);
+				// convert the message in a image
+				int x = data_block_offset_, y = data_block_offset_;
+				//std::cout << "msg: " << shared_buffer_.get() << std::endl;
+				storedata::codify::CodifyImage::data2image(shared_buffer_.get(),
+					raw_data_size_ + timestamp_size, data_block_size_,
+					data_block_offset_, m_data_block_, x, y);
+
+				// compose the images
+				cv::Size frame_size(tmp.cols, tmp.rows + m_data_block_.rows);
+				cv::Mat m(frame_size, tmp.type());
+				// copy the source
+				tmp.copyTo(m(cv::Rect(0, 0, tmp.cols, tmp.rows)));
+				// copy the data
+				m_data_block_.copyTo(m(cv::Rect(0, tmp.rows,
+					m_data_block_.cols, m_data_block_.rows)));
+				// record
+				std::map<int, cv::Mat> sources = { { 0, m } };
+				//std::cout << "image size: " << m.size() << " " << timestamp << " size: " << raw_data_size_ + s << std::endl;
+				if (!is_initialize_recorder_) {
+					// create the meta frame
+					cv::Mat meta_frame(m.size(), CV_8UC3, cv::Scalar::all(0));
+					// data offset, image source size
+					std::string msg_meta =
+						std::to_string(shared_buffer_size_) + " " +
+						std::to_string(msg_len_max_bytes_) + " " +
+						std::to_string(data_block_size_) + " " +
+						std::to_string(data_block_offset_) + " " +
+						std::to_string(tmp.cols) + " " +
+						std::to_string(tmp.rows);
+					std::cout << "msg_meta: " << msg_meta << std::endl;
+					int meta_data_block_size = 1;
+					int meta_data_block_offset = 1;
+					int meta_x = 0, meta_y = 0;
+					storedata::codify::CodifyImage::merge_strings2image(
+						std::vector<std::string>() = { msg_meta },
+						meta_data_block_size, meta_data_block_offset,
+						meta_frame, meta_x, meta_y);
+					std::string msg_meta_decoded;
+					meta_x = 0, meta_y = 0;
+					storedata::codify::CodifyImage::image2string(
+						meta_frame, meta_x, meta_y,
+						meta_data_block_size, meta_data_block_offset,
+						msg_meta_decoded);
+					std::cout << "msg_meta_decoded: " << msg_meta_decoded <<
+						std::endl;
+					//cv::imshow("meta_frame", meta_frame);
+					//cv::waitKey(1);
+
+					//std::cout << "inti_recorder: " << fname_video_path_ << std::endl;
+					is_initialize_recorder_ = true;
+					player_recorder_.setup_video(sources,
+						fname_video_path_, kMaxFramesRecorded_, fps_);
+					player_recorder_.setup_metaframe(meta_frame);
+				}
+				// record the source
+				player_recorder_.record_video(sources);
+			}
+			else {
+				// use record dat file
+				player_recorder_.record(tmp, true, shared_buffer_.get(),
+					raw_data_size_ + timestamp_size);
+			}
+			done_ = true;
+		});
+		t_player_recorder_.detach();
+		return EARM_OK;
+	}
+
+	return EARM_BUSY;
+}
+// ----------------------------------------------------------------------------
 bool EnhanceAsyncRecorderManager::is_object_initialized() {
 	return is_object_initialized_;
 }
