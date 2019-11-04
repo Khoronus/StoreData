@@ -14,7 +14,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * @author Alessandro Moro <alessandromoro.italy@google.com>
+ * @author Alessandro Moro <alessandromoro.italy@gmail.com>
  * @bug No known bugs.
  * @version 0.2.0.0
  * 
@@ -32,9 +32,9 @@ RawRecorder::~RawRecorder() {
 	fgm_.close();
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::setup(const std::string &filename,
+void RawRecorder::setup(const std::string &filename_root,
 	int max_memory_allocable, int fps) {
-	fgp_[0].set_filename(filename);
+	fgp_[0].set_filename(filename_root);
 	fgm_.setup(max_memory_allocable, fgp_, fps);
 }
 // ----------------------------------------------------------------------------
@@ -47,11 +47,33 @@ void RawRecorder::record(uint8_t* data, size_t len) {
 
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
-	m_data[0] = std::vector<char>(size_msg_data + 4);
+	m_data[0] = std::vector<char>(size_msg_data + sizeof(size_t));
 
 	// Copy the data
-	memcpy(&m_data[0][0], &size_msg_data, sizeof(int));
-	memcpy(&m_data[0][4], &info_to_transmit[0],
+	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
+	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
+		size_msg_data);
+	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+}
+// ----------------------------------------------------------------------------
+void RawRecorder::record(void* data, size_t len) {
+	record(data, len);
+}
+// ----------------------------------------------------------------------------
+void RawRecorder::record(const void* data, size_t len) {
+	if (fgm_.under_writing()) return;
+	// Add the information to transmit
+	size_t size_msg_data = len;
+	std::vector<char> info_to_transmit(size_msg_data);
+	memcpy(&info_to_transmit[0], data, size_msg_data);
+
+	// Prepare the container for the data to transmit
+	std::map<int, std::vector<char> > m_data;
+	m_data[0] = std::vector<char>(size_msg_data + sizeof(size_t));
+
+	// Copy the data
+	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
+	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
 	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
 }
@@ -65,11 +87,11 @@ void RawRecorder::record(const std::vector<uint8_t> &data) {
 
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
-	m_data[0] = std::vector<char>(size_msg_data + 4);
+	m_data[0] = std::vector<char>(size_msg_data + sizeof(size_t));
 
 	// Copy the data
-	memcpy(&m_data[0][0], &size_msg_data, sizeof(int));
-	memcpy(&m_data[0][4], &info_to_transmit[0],
+	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
+	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
 	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
 }
@@ -83,11 +105,11 @@ void RawRecorder::record(const std::string &msg) {
 
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
-	m_data[0] = std::vector<char>(size_msg_data + 4);
+	m_data[0] = std::vector<char>(size_msg_data + sizeof(size_t));
 
 	// Copy the data
-	memcpy(&m_data[0][0], &size_msg_data, sizeof(int));
-	memcpy(&m_data[0][4], &info_to_transmit[0], 
+	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
+	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
 	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
 }
@@ -102,11 +124,11 @@ void RawRecorder::record_t(_Ty data, size_t len) {
 
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
-	m_data[0] = std::vector<char>(size_msg_data + 4);
+	m_data[0] = std::vector<char>(size_msg_data + sizeof(size_t));
 
 	// Copy the data
-	memcpy(&m_data[0][0], &size_msg_data, sizeof(int));
-	memcpy(&m_data[0][4], &info_to_transmit[0],
+	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
+	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
 	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
 }

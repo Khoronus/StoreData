@@ -54,13 +54,18 @@ public:
 	STOREDATA_RECORD_EXPORT ~RawRecorder();
 
 	/** @brief Setup the recorder properties
+
+		@param[in] filename_root The filename that is used as root for the new 
+		           file. i.e. Record_
 	*/
-	STOREDATA_RECORD_EXPORT void setup(const std::string &filename,
+	STOREDATA_RECORD_EXPORT void setup(const std::string &filename_root,
 		int max_memory_allocable, int fps);
 
 	STOREDATA_RECORD_EXPORT void record(const std::string &msg);
 	STOREDATA_RECORD_EXPORT void record(const std::vector<uint8_t> &data);
 	STOREDATA_RECORD_EXPORT void record(uint8_t* data, size_t len);
+	STOREDATA_RECORD_EXPORT void record(void* data, size_t len);
+	STOREDATA_RECORD_EXPORT void record(const void* data, size_t len);
 	template <typename _Ty>
 	STOREDATA_RECORD_EXPORT void record_t(_Ty data, size_t len);
 
