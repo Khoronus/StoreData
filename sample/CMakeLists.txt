@@ -56,6 +56,7 @@ CREATE_EXAMPLE(sample_rawrecord_serialized "sample_rawrecord_serialized" "record
 CREATE_EXAMPLE(sample_record_saveplayfile_avi "sample_record_saveplayfile_avi" "record;codify")
 CREATE_EXAMPLE(sample_record_saveplayfile_avi_v2 "sample_record_saveplayfile_avi_v2" "record;codify;video;StoreData")
 CREATE_EXAMPLE(sample_record_container "sample_record_container" "record")
+CREATE_EXAMPLE(sample_record_container_video "sample_record_container_video" "record")
 CREATE_EXAMPLE(sample_volatile_timed_buffer "sample_volatile_timed_buffer" "buffer;record")
 
 
