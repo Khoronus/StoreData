@@ -22,8 +22,8 @@
 */
 
 
-#ifndef SENSORCORECORE_SENSORCORECOREWORLD_RECORDCONTAINERVIDEO_HPP__
-#define SENSORCORECORE_SENSORCORECOREWORLD_RECORDCONTAINERVIDEO_HPP__
+#ifndef STOREDATA_RECORD_RECORDCONTAINERVIDEO_HPP__
+#define STOREDATA_RECORD_RECORDCONTAINERVIDEO_HPP__
 
 #include <vector>
 #include <iostream>
@@ -64,7 +64,7 @@ public:
 
 	/** @brief It push a new frame to save
 	*/
-	STOREDATA_RECORD_EXPORT void push(const std::string &fname, RecordContainerData &rcd);
+	STOREDATA_RECORD_EXPORT void push(const std::string &msg, RecordContainerData &rcd);
 
 	/** @brief It push a new microbuffer to save
 	*/
@@ -154,7 +154,7 @@ private:
 	*/
 	bool is_running_;
 
-	/** @brief Container with the data to save
+	/** @brief Container with the data to save and a message associated
 	*/
 	std::queue<std::pair<std::string, RecordContainerData>> container_;
 
@@ -185,4 +185,4 @@ private:
 
 
 
-#endif // SENSORCORECORE_SENSORCORECOREWORLD_RECORDCONTAINERVIDEO_HPP__
+#endif // STOREDATA_RECORD_

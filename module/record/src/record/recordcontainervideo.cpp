@@ -30,11 +30,11 @@ RecordContainerVideo::RecordContainerVideo() {
 	num_elems_microbuffer_approx_ = 0;
 }
 //-----------------------------------------------------------------------------
-void RecordContainerVideo::push(const std::string &fname, RecordContainerData &rcd) {
+void RecordContainerVideo::push(const std::string &msg, RecordContainerData &rcd) {
 	{
 		std::lock_guard<std::mutex> lk(mtx_);
 		// Add the data
-		container_.push(std::make_pair(fname, rcd));
+		container_.push(std::make_pair(msg, rcd));
 		data_ready_ = true;
 	}
 
@@ -68,6 +68,7 @@ void RecordContainerVideo::stop() {
 }
 //-----------------------------------------------------------------------------
 void RecordContainerVideo::internal_thread() {
+
 	is_running_ = true;
 	while (continue_save_) {
 
@@ -90,6 +91,15 @@ void RecordContainerVideo::internal_thread() {
 				container_.pop();
 			}
 		}
+		// check potential errors
+		if (size_image_.width == 0 || size_image_.height == 0 ||
+			fname_root_.size() == 0) {
+			std::cout << "[e] size_image_:" << size_image_ <<
+				" fname_root_:" << fname_root_ << std::endl;
+			continue_save_ = false;
+			continue;
+		}
+
 		// Process the data
 		if (tuple.second.data) {
 			// convert the binary in image

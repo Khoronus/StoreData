@@ -1,5 +1,5 @@
 /**
-* @file recordcontainer.hpp
+* @file DataDesynchronizerGeneric.hpp
 * @brief Header of the defined class
 *
 * @section LICENSE
@@ -22,8 +22,8 @@
 */
 
 
-#ifndef STOREDATA_RECORD_RECORDCONTAINER_HPP__
-#define STOREDATA_RECORD_RECORDCONTAINER_HPP__
+#ifndef STOREDATA_BUFFER_RECORDCONTAINERGENERIC_HPP__
+#define STOREDATA_BUFFER_RECORDCONTAINERGENERIC_HPP__
 
 #include <vector>
 #include <iostream>
@@ -34,89 +34,56 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "buffer/buffer_headers.hpp"
 #include "logger/inc/logger/log.hpp"
+#include "AtomicContainerData.hpp"
 
-#include "record_defines.hpp"
-
-//#define dWriteData(a, b) try { cv::imwrite(a, b); }                            \
-//                         catch(...) { std::cout << "Default exception"; }
-
-#define dWriteData(a, b) try { 	FILE *fp; \
-                         fp = fopen(a.c_str(), "w"); \
-                         fwrite(b.data, 1, b.size_bytes, fp); \
-                         fclose(fp); }                   \
-                         catch(...) { std::cout << "Default exception"; }
-
-//#define dWriteData(a, b) try { } catch(...){std::cout << "Default exception";}
-
-struct STOREDATA_RECORD_EXPORT RecordContainerData
+namespace storedata
 {
-	void* data;
-	size_t size_bytes;
-	RecordContainerData() : data(nullptr) {}
-	void copyFrom(const void* src, size_t src_size_bytes) {
-		if (data) dispose();
-		size_bytes = src_size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, src, size_bytes);
-	}
-	void copyFrom(RecordContainerData &obj) {
-		if (data) dispose();
-		size_bytes = obj.size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, obj.data, obj.size_bytes);
-	}
-	void dispose() {
-		if (data) { free(data); data = nullptr; }
-	}
-};
+
+/** @brief Function to process the data
+
+	Callback function to process the data.
+*/
+typedef std::function<void(const std::string &msg, AtomicContainerData &rcd)> cbk_func;
+
 
 /** @brief Class to record all the frames currently captured
 */
-class RecordContainer
+class DataDesynchronizerGeneric
 {
 
 public:
 
-	STOREDATA_RECORD_EXPORT RecordContainer();
+	STOREDATA_BUFFER_EXPORT DataDesynchronizerGeneric();
 
 	/** @brief It push a new frame to save
 	*/
-	STOREDATA_RECORD_EXPORT void push(const std::string &fname, RecordContainerData &rcd);
-
-	/** @brief It push a new microbuffer to save
-	*/
-	STOREDATA_RECORD_EXPORT void push(std::vector<vb::PtrMicrobuffer> &vptr);
+	STOREDATA_BUFFER_EXPORT void push(const std::string &msg, AtomicContainerData &rcd);
 
 	/** @brief It starts the thread
 	*/
-	STOREDATA_RECORD_EXPORT bool start();
+	STOREDATA_BUFFER_EXPORT bool start();
 
 	/** @brief It stops the thread
 	*/
-	STOREDATA_RECORD_EXPORT void stop();
+	STOREDATA_BUFFER_EXPORT void stop();
 
 	/** @brief Thread used to save the current container of images
 	*/
-	STOREDATA_RECORD_EXPORT void internal_thread();
+	STOREDATA_BUFFER_EXPORT void internal_thread();
 
 	/** @brief It sets the save boosting. If true it use multiple threads to
 	save.
 	*/
-	STOREDATA_RECORD_EXPORT void set_save_boost(bool save_boost);
+	STOREDATA_BUFFER_EXPORT void set_save_boost(bool save_boost);
 
 	/** @brief It returns the about size of the writing queue
 	*/
-	STOREDATA_RECORD_EXPORT size_t size_about();
-
-	/** @brief It returns the about size of the microbuffer
-	*/
-	STOREDATA_RECORD_EXPORT size_t size_about_micro();
+	STOREDATA_BUFFER_EXPORT size_t size_about();
 
 	/** @brief It returns the running status
 	*/
-	STOREDATA_RECORD_EXPORT bool is_running();
+	STOREDATA_BUFFER_EXPORT bool is_running();
 
 	/** @brief Since the internal thread is detached, it is necessary to 
 	           wait until is not ready.
@@ -124,7 +91,7 @@ public:
 		The function try to stop for n iterations and wait m ms.
 		@return It returns true in case of success. False otherwise.
 	*/
-	STOREDATA_RECORD_EXPORT bool wait_until_is_not_ready(size_t num_iterations, int sleep_ms);
+	STOREDATA_BUFFER_EXPORT bool wait_until_is_not_ready(size_t num_iterations, int sleep_ms);
 
 	/** @brief Since the internal thread is detached, it is necessary to
 		   wait until is not ready.
@@ -132,7 +99,12 @@ public:
 		The function try to stop for n iterations and wait m ms.
 		@return It returns true in case of success. False otherwise.
 	*/
-	STOREDATA_RECORD_EXPORT bool wait_until_buffer_is_empty(size_t num_iterations, int sleep_ms);
+	STOREDATA_BUFFER_EXPORT bool wait_until_buffer_is_empty(size_t num_iterations, int sleep_ms);
+
+	/** @brief It sets the callback for the function that record data
+	*/
+	STOREDATA_BUFFER_EXPORT void set_cbk_func(
+		cbk_func callback_func);
 
 private:
 
@@ -165,20 +137,16 @@ private:
 	*/
 	bool is_running_;
 
-	/** @brief Container with the data to save
+	/** @brief Container with the data to save and a message associated
 	*/
-	std::queue<std::pair<std::string, RecordContainerData>> container_;
+	std::queue<std::pair<std::string, AtomicContainerData>> container_;
 
-	/** @brief Container with the microbuffer to save
+	/** @brief Callback recorder function
 	*/
-	std::queue<std::vector<vb::PtrMicrobuffer>> container_microbuffer_;
-	/** @brief Approximatively how many elements are under saving for the 
-	           microbuffer.
-	*/
-	size_t num_elems_microbuffer_approx_;
+	cbk_func callback_func_;
 };
 
 
+} // namespace storedata
 
-
-#endif // STOREDATA_RECORD_RECORDCONTAINER_HPP__
+#endif // STOREDATA_BUFFER_RECORDCONTAINERGENERIC_HPP__
