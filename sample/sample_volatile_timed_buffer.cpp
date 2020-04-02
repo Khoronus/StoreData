@@ -52,6 +52,18 @@ private:
 };
 
 
+/** @brief It displays the menu
+*/
+void help() {
+	std::cout << "[esc]: close" << std::endl;
+	std::cout << "s: start bufferize" << std::endl;
+	std::cout << "p: stop bufferize" << std::endl;
+	std::cout << "i: copy small buffer" << std::endl;
+	std::cout << "o: clear" << std::endl;
+	std::cout << "t: display" << std::endl;
+	std::cout << "h: help" << std::endl;
+}
+
 //-----------------------------------------------------------------------------
 void main()
 {
@@ -67,6 +79,8 @@ void main()
 
 	// Container with the margin buffer
 	std::vector<vb::PtrMicrobuffer> vptr;
+
+	help();
 
 	double start = cv::getTickCount();
 	bool continue_capture = true;
@@ -101,6 +115,7 @@ void main()
 		cv::imshow("m", m);
 		char c = cv::waitKey(1);
 
+
 		switch (c) {
 		case 27:
 			continue_capture = false;
@@ -127,6 +142,10 @@ void main()
 					cv::waitKey(1);
 				}
 			}
+			break;
+		case 'h':
+			help();
+			break;
 		}
 	}
 }
