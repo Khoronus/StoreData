@@ -17,3 +17,22 @@ TODO
 > Object memory should be shared. Clone should be optional.
 > Raw recorder should allow the serialization.
 > Microbuffer and volatile should be template and not a fix object (pair <string, cv::Mat>)
+
+
+
+
+
+
+
+codify_data.hpp
+ CodifyData2Image -> obsolete
+
+sample_codify.cpp (example of codify message inside an image)
+
+RawRecorder : record binary data
+sample_rawrecord.cpp
+  Record binary data
+  Read binary data
+sample_rawrecord_serialized.cpp
+  Record binary serialized (boost) data.
+  

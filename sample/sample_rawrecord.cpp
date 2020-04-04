@@ -32,11 +32,24 @@
 
 #include "record/record_headers.hpp"
 
-#include "UDPKomatsu2Arm.hpp"
-
 // ----------------------------------------------------------------------------
 namespace
 {
+
+/** @brief It creates a folder if necessary
+*/
+void create_folder(const std::string &folder) {
+	boost::filesystem::path dir(folder);
+	if (boost::filesystem::create_directory(dir)) {
+		std::cout << "[+] Root::sanity_check: create " <<
+			dir.string().c_str() << std::endl;
+	}
+	else {
+		std::cout << "[-] Root::sanity_check: create " <<
+			dir.string().c_str() << std::endl;
+	}
+}
+
 
 /** @brief Change the name of the file.
 
@@ -57,10 +70,11 @@ int record_raw() {
 		return 0;
 	}
 
+	// Store the data recorded
 	storedata::RawRecorder pr;
 	pr.set_callback_createfile(std::bind(&name_changed,
 		std::placeholders::_1));
-	pr.setup("data\\record_", 10000, 100);
+	pr.setup("data_recordraw\\record_", 10000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{
@@ -80,28 +94,13 @@ int record_raw() {
 	return 0;
 }
 
-
-/** @brief It creates a folder if necessary
-*/
-void create_folder(const std::string &folder) {
-	boost::filesystem::path dir(folder);
-	if (boost::filesystem::create_directory(dir)) {
-		std::cout << "[+] Root::sanity_check: create " <<
-			dir.string().c_str() << std::endl;
-	}
-	else {
-		std::cout << "[-] Root::sanity_check: create " <<
-			dir.string().c_str() << std::endl;
-	}
-}
-
 } // namespace anonymous
 
 /**	 Main code
 */
 int main(int argc, char *argv[], char *window_name)
 {
-	create_folder("data");
+	create_folder("data_recordraw");
 	create_folder("unpack");
 
 	// record a video with a raw data saver
@@ -110,8 +109,9 @@ int main(int argc, char *argv[], char *window_name)
 		record_raw();
 		// Record a video and save some simple data
 		storedata::RawRecorder pr;
-		std::cout << "[!] open: " << global_fname << std::endl;
-		pr.play("data\\record_" + global_fname + ".dat", 60);
+		std::string fname = "data_recordraw\\record_" + global_fname + ".dat";
+		std::cout << "[!] open: " << fname << std::endl;
+		pr.play(fname, 60);
 	}
 
 	return 0;

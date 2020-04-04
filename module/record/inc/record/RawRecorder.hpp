@@ -69,6 +69,13 @@ public:
 	template <typename _Ty>
 	STOREDATA_RECORD_EXPORT void record_t(_Ty data, size_t len);
 
+	/** @brief It reads binary data and put in a container.
+
+		The container has the binary data for each pushed data.
+	*/
+	STOREDATA_RECORD_EXPORT void read(const std::string &filename, 
+		std::vector< std::vector<uint8_t> > &data_info);
+
 	STOREDATA_RECORD_EXPORT void play(const std::string &filename, int FPS);
 	STOREDATA_RECORD_EXPORT void play_raw(const std::string &filename, int FPS);
 

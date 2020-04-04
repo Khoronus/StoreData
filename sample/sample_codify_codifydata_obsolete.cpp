@@ -29,6 +29,7 @@ namespace
 
 void test()
 {
+	std::cout << "Example over an obsolete code" << std::endl;
 	storedata::codify::CodifyData2Image::test();
 }
 

@@ -39,6 +39,8 @@ namespace codify
 
 
 /** @brief Class to pack or unpack a collection of images.
+
+	It requires OpenCV.
 */
 class PackUnpackImages
 {

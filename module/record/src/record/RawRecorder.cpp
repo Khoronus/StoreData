@@ -134,9 +134,8 @@ void RawRecorder::record_t(_Ty data, size_t len) {
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::play(const std::string &filename, int FPS) {
+	std::cout << "RawRecorder::play:" << filename << std::endl;
 	int _FPS = (std::max)(1, FPS);
-	// Read the data
-	bool bPlayRecord = true;
 	std::ifstream file(filename.c_str(),
 		std::ios::in | std::ios::binary | std::ios::ate);
 	int size = 0;
@@ -164,6 +163,26 @@ void RawRecorder::play(const std::string &filename, int FPS) {
 			msg[i] = (*it)[i];
 		msg[it->size()] = '\0';
 		std::cout << "msg: " << msg << std::endl;
+	}
+}	
+// ----------------------------------------------------------------------------
+void RawRecorder::read(const std::string &filename,
+	std::vector< std::vector<uint8_t> > &data_info) {
+
+	// Read the data
+	std::ifstream file(filename.c_str(),
+		std::ios::in | std::ios::binary | std::ios::ate);
+	int size = 0;
+	char *memblock = nullptr;
+	if (file.is_open())
+	{
+		size = file.tellg();
+		memblock = new char[size];
+		file.seekg(0, std::ios::beg);
+		file.read(memblock, size);
+		file.close();
+		data2data_type(memblock, size, data_info);
+		delete[] memblock;
 	}
 }
 // ----------------------------------------------------------------------------
@@ -307,10 +326,11 @@ void RawRecorder::data2data_type(char *data, int maxsize,
 	int pos = 0;
 	while (pos < maxsize) {
 		//std::cout << "read: " << pos << " " << maxsize << std::endl;
-		int msgsize = 0;
-		memcpy(&msgsize, &data[pos], 4);
-		pos += 4;
-		if (msgsize < maxsize)
+		size_t msgsize = 0;
+		memcpy(&msgsize, &data[pos], sizeof(msgsize));
+		pos += sizeof(msgsize);
+		if (msgsize < maxsize &&
+			pos + msgsize < maxsize)
 		{
 			std::vector<uint8_t> msg_tmp(msgsize);
 			memcpy(&msg_tmp[0], &data[pos], msgsize);

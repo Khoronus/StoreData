@@ -4,47 +4,6 @@
 int data_block_size = 1;
 int data_block_offset = 1;
 
-/** @brief Read recorded video
-*/
-void read() {
-	cv::VideoCapture vc("MyVideo.avi");
-
-	cv::Mat tmp(480, 640, CV_8UC3);
-	//cv::Mat m_data_block(30, frame_width, CV_8UC3, cv::Scalar::all(0));
-	cv::Mat m_data_block;
-	size_t msg_len_max_bytes = 500;
-	storedata::codify::CodifyImage::estimate_data_size(tmp, msg_len_max_bytes, 
-		data_block_size, data_block_offset, m_data_block);
-
-
-	bool write_img = true;
-	if (vc.isOpened()) {
-		int num_frame = 0;
-		while (true)
-		{
-			cv::Mat m;
-			vc >> m;
-			if (m.empty()) {
-				break;
-			}
-			if (write_img) {
-				write_img = false;
-				cv::imwrite("m.png", m);
-			}
-			int x = data_block_offset, y = data_block_offset;
-			std::string msg_out;
-			storedata::codify::CodifyImage::image2string(m(cv::Rect(0, tmp.rows, tmp.cols,
-				m.rows - tmp.rows)), x, y, data_block_size, 
-				data_block_offset, msg_out);
-			std::cout << "msg_out: " << msg_out << std::endl;
-
-			cv::imshow("m", m);
-			if (cv::waitKey(1) == 27) break;
-		}
-	}
-}
-
-
 /** @readme Possible DECODE sample
 */
 void read2(int argc, char* argv[]) {
@@ -121,7 +80,7 @@ void read2(int argc, char* argv[]) {
 
 /** @brief Test record
 */
-void test() {
+void write() {
 	//Open the default video camera
 	cv::VideoCapture cap(0);
 
@@ -227,12 +186,57 @@ void test() {
 }
 
 
+/** @brief Read recorded video
+*/
+void read() {
+	cv::VideoCapture vc("MyVideo.avi");
+
+	cv::Mat tmp(480, 640, CV_8UC3);
+	//cv::Mat m_data_block(30, frame_width, CV_8UC3, cv::Scalar::all(0));
+	cv::Mat m_data_block;
+	size_t msg_len_max_bytes = 500;
+	storedata::codify::CodifyImage::estimate_data_size(tmp, msg_len_max_bytes,
+		data_block_size, data_block_offset, m_data_block);
+
+
+	bool write_img = true;
+	if (vc.isOpened()) {
+		int num_frame = 0;
+		while (true)
+		{
+			cv::Mat m;
+			vc >> m;
+			if (m.empty()) {
+				break;
+			}
+			if (write_img) {
+				write_img = false;
+				cv::imwrite("m.png", m);
+			}
+			int x = data_block_offset, y = data_block_offset;
+			std::string msg_out;
+			storedata::codify::CodifyImage::image2string(m(cv::Rect(0, tmp.rows, tmp.cols,
+				m.rows - tmp.rows)), x, y, data_block_size,
+				data_block_offset, msg_out);
+			std::cout << "msg_out: " << msg_out << std::endl;
+
+			cv::imshow("m", m);
+			if (cv::waitKey(1) == 27) break;
+		}
+	}
+}
+
+
 //-----------------------------------------------------------------------------
 void main(int argc, char* argv[]) {
+
+	std::cout << "This project shows how some text is codified inside a ";
+	std::cout << "frame. All the size information are known for both writing ";
+	std::cout << "and reading." << std::endl;
 	// read a video saved in the impact field (warning the file may not exist)
 	//read2(argc, argv);
 	//return;
-	test();
+	write();
 	read();
 	return;
 }

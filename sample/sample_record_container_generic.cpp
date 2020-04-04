@@ -306,6 +306,10 @@ void main()
 			bufferize = true;
 			record_container[0].start();
 			break;
+		case 'n':
+			bufferize = false;
+			record_container[0].stop();
+			break;
 		case 'p':
 			bufferize = false;
 			break;

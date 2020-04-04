@@ -46,7 +46,7 @@ include_directories(
 #######################################################################
 CREATE_EXAMPLE(sample_buffering "sample_buffering" "buffer;logger;record")
 CREATE_EXAMPLE(sample_codify "sample_codify" "codify")
-CREATE_EXAMPLE(sample_codify_codifydata "sample_codify_codifydata" "codify")
+CREATE_EXAMPLE(sample_codify_codifydata_obsolete "sample_codify_codifydata_obsolete" "codify")
 CREATE_EXAMPLE(sample_codify_packunpackimages "sample_codify_packunpackimages" "codify")
 CREATE_EXAMPLE(sample_logger "sample_logger" "logger")
 CREATE_EXAMPLE(sample_record_saveplayfile "sample_record_saveplayfile" "record;codify")

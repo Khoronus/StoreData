@@ -212,6 +212,31 @@ public:
 namespace
 {
 
+/** @brief It creates a folder if necessary
+*/
+void create_folder(const std::string &folder) {
+	boost::filesystem::path dir(folder);
+	if (boost::filesystem::create_directory(dir)) {
+		std::cout << "[+] Root::sanity_check: create " <<
+			dir.string().c_str() << std::endl;
+	}
+	else {
+		std::cout << "[-] Root::sanity_check: create " <<
+			dir.string().c_str() << std::endl;
+	}
+}
+
+/** @brief Change the name of the file.
+
+	Function from the callback
+*/
+std::string global_fname;
+void name_changed(const std::string &fname) {
+	std::cout << "name_changed: " << fname << std::endl;
+	global_fname = fname;
+}
+
+
 /** @brief It records a video with a raw recorder
 */
 int record_raw() {
@@ -222,7 +247,9 @@ int record_raw() {
 	}
 
 	storedata::RawRecorder pr;
-	pr.setup("data\\record_", 1000000000, 100);
+	pr.set_callback_createfile(std::bind(&name_changed,
+		std::placeholders::_1));
+	pr.setup("data_recordraw\\record_", 1000000000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{
@@ -250,61 +277,13 @@ int record_raw() {
 	return 0;
 }
 
-
-/** @brief It creates a folder if necessary
-*/
-void create_folder(const std::string &folder) {
-	boost::filesystem::path dir(folder);
-	if (boost::filesystem::create_directory(dir)) {
-		std::cout << "[+] Root::sanity_check: create " <<
-			dir.string().c_str() << std::endl;
-	}
-	else {
-		std::cout << "[-] Root::sanity_check: create " <<
-			dir.string().c_str() << std::endl;
-	}
-}
-
-
 // ----------------------------------------------------------------------------
-void data2data_type(char *data, int maxsize,
-	std::vector< std::vector<uint8_t> > &out)
-{
-	int pos = 0;
-	while (pos < maxsize) {
-		//std::cout << "read: " << pos << " " << maxsize << std::endl;
-		int msgsize = 0;
-		memcpy(&msgsize, &data[pos], 4);
-		pos += 4;
-		if (msgsize < maxsize)
-		{
-			std::vector<uint8_t> msg_tmp(msgsize);
-			memcpy(&msg_tmp[0], &data[pos], msgsize);
-			//std::vector<uint8_t> v(msgsize);
-			//for (int i = 0; i < msgsize; i++)
-			//	v[i] = msg_tmp[i];
-			out.push_back(msg_tmp);
-		}
-		pos += msgsize;
-	}
-}
-// ----------------------------------------------------------------------------
-void read_raw(const std::string &filename) {
-	std::ifstream file(filename.c_str(),
-		std::ios::in | std::ios::binary | std::ios::ate);
-	int size = 0;
-	char *memblock = nullptr;
+void rawrecorder_read_raw(const std::string &filename) {
+
 	std::vector< std::vector<uint8_t> > data_info;
-	if (file.is_open())
-	{
-		size = file.tellg();
-		memblock = new char[size];
-		file.seekg(0, std::ios::beg);
-		file.read(memblock, size);
-		file.close();
-		data2data_type(memblock, size, data_info);
-		delete[] memblock;
-	}
+	storedata::RawRecorder rr;
+	rr.read(filename, data_info);
+
 	std::cout << "Found: " << data_info.size() << " frames" << std::endl;
 
 	int idx = 0;
@@ -334,20 +313,15 @@ void read_raw(const std::string &filename) {
 */
 int main(int argc, char *argv[], char *window_name)
 {
-	read_raw("data\\record_2019_10_06_08_38_54.dat");
-	return 0;
-
-	create_folder("data");
+	std::cout << "It records a serialized data (boost) into a file" << std::endl;
+	// record a video with a raw data saver
+	create_folder("data_recordraw");
 	create_folder("unpack");
 
-	// record a video with a raw data saver
-	if (true)
-	{
-		record_raw();
-		// Record a video and save some simple data
-		//storedata::RawRecorder pr;
-		//pr.play("data\\record_2018-12-07.08_20_38.dat", 60);
-	}
-
+	record_raw();
+	std::string fname = "data_recordraw\\record_" + global_fname + ".dat";
+	std::cout << "[!] open: " << fname << std::endl;
+	rawrecorder_read_raw(fname);
 	return 0;
+
 }

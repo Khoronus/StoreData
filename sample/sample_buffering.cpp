@@ -77,11 +77,6 @@ private:
 namespace
 {
 
-/** @brief Function to test the small buffer
-*/
-void test_smallbuffer() {
-
-}
 
 void test_record() {
 	/** @brief Container with the data to record
@@ -114,9 +109,6 @@ void test_record() {
 
 	// Clean size of the frame expire
 	small_buffer[id].clean(t_internal, save_frame_expire_time_sec);
-
-	// Add the frame in the main buffer for the saving
-	//record_container[id].push(fname, src);
 }
 
 /** @brief It record some image data
@@ -146,6 +138,7 @@ void test_record2() {
 		record_container[id].push("data\\" + std::to_string(i) + ".dat", rcd);
 	}
 	record_container[id].stop();
+	record_container[id].wait_until_buffer_is_empty(1000, 5);
 }
 
 } // namespace anonymous
@@ -154,7 +147,7 @@ void test_record2() {
 */
 int main(int argc, char *argv[], char *window_name)
 {
-	//test_smallbuffer();
+	test_record();
 	test_record2();
 	return 0;
 }
