@@ -114,7 +114,7 @@ private:
 	std::map<int, FileGeneratorParams> fgp_;
 
 	// <video>
-	VideoGeneratorManager vgm_;
+	VideoGeneratorManagerAsync vgm_;
 	/** @brief File Generator parameters
 	*/
 	std::map<int, VideoGeneratorParams> vgp_;

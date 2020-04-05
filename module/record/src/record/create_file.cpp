@@ -51,41 +51,41 @@ int MemorizeFileManager::generate(const std::string &appendix, bool append) {
 		std::cout << filename << std::endl;
 		// get the current time
 		if (append) {
-		fout_.open(filename.c_str(), std::ios::binary | std::ios::app);
-		}
-		else {
-		fout_.open(filename.c_str(), std::ios::binary);
+			fout_.open(filename.c_str(), std::ios::binary | std::ios::app);
+		} else {
+			fout_.open(filename.c_str(), std::ios::binary);
 		}
 		// Get the file size
 		memory_expected_allocated_ = filesize(filename.c_str());
-		return 1;
+		return kSuccess;
 	}
-	return 0;
+	return kFail;
 }
 // ----------------------------------------------------------------------------
 int MemorizeFileManager::check_memory(size_t size) {
 	//std::cout << ">> " << memory_expected_allocated_ << " " << size << " " << memory_max_allocable_ << std::endl;
 	if (memory_expected_allocated_ + size < memory_max_allocable_) {
-		return 1;
+		return kSuccess;
 	}
-	return 0;
+	return kFail;
 }
 // ----------------------------------------------------------------------------
 int MemorizeFileManager::push(const std::vector<char> &data) {
+	if (!fout_.is_open()) return kFileIsNotOpen;
+
 	if (data.size() > 0) {
 		if (check_memory(data.size())) {
 			fout_.write(&data[0], data.size());
 			fout_.flush();
 			memory_expected_allocated_ += data.size();
-			return 1;
-		}
-		else {
+			return kSuccess;
+		} else {
 			// out of memory
-			return -1;
+			return kOutOfMemory;
 		}
 	}
-	// The video is not allocated
-	return 0;
+	// The data is empty
+	return kDataIsEmpty;
 }
 // ----------------------------------------------------------------------------
 FileGeneratorManagerAsync::FileGeneratorManagerAsync(){
@@ -277,11 +277,11 @@ int FileGeneratorManagerAsync::push_data(const std::map<int, std::vector<char> >
 			}
 			boost::thread* thr = new boost::thread(
 				boost::bind(&FileGeneratorManagerAsync::procedure, this));
-			return 1;
+			return kSuccess;
 		}
 	}
 #endif
-	return 0;
+	return kFail;
 }
 // ----------------------------------------------------------------------------
 void FileGeneratorManagerAsync::close() {

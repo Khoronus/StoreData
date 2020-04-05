@@ -134,12 +134,15 @@ void main()
 			vptr.clear();
 			break;
 		case 't':
-			for (auto &it : vptr) {
-				for (auto &it2 : *it) {
-					std::cout << "> " << it2.first << " " << 
-						static_cast<MicroBufferObjDerived*>(it2.second.get())->msg() << std::endl;
-					cv::imshow("m", static_cast<MicroBufferObjDerived*>(it2.second.get())->img());
-					cv::waitKey(1);
+			{
+				//for (auto &it : vptr) {
+				for (std::vector<vb::PtrMicrobuffer>::reverse_iterator it = vptr.rbegin(); it != vptr.rend(); ++it) {
+					for (auto &it2 : **it) {
+						std::cout << "> " << it2.first << " " <<
+							static_cast<MicroBufferObjDerived*>(it2.second.get())->msg() << std::endl;
+						cv::imshow("m", static_cast<MicroBufferObjDerived*>(it2.second.get())->img());
+						cv::waitKey(1);
+					}
 				}
 			}
 			break;

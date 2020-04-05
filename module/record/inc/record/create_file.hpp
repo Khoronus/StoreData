@@ -45,6 +45,12 @@
 namespace storedata
 {
 
+const int kSuccess = 1;
+const int kFail = 0;
+const int kOutOfMemory = -1;
+const int kDataIsEmpty = -2;
+const int kFileIsNotOpen = -3;
+
 /** @brief Class to capture video with a maximum size.
 */
 class MemorizeFileManager
@@ -64,7 +70,7 @@ class MemorizeFileManager
 	  STOREDATA_RECORD_EXPORT void setup(size_t memory_max_allocable,
 		  const std::string &filename);
 
-	  /** @brief Generate a video capture file.
+	  /** @brief Generate a target binary file.
 	  */
 	  STOREDATA_RECORD_EXPORT int generate(const std::string &appendix, bool append);
 
@@ -99,6 +105,8 @@ class MemorizeFileManager
 		std::ifstream in(filename.c_str(), std::ifstream::ate | std::ifstream::binary);
 		return in.tellg();
 	}
+
+
 
 };
 
@@ -148,7 +156,10 @@ public:
 
 	STOREDATA_RECORD_EXPORT void check();
 
-	/** @brief Try to push the frame data in a video.
+	/** @brief Try to push the frame data in a file.
+
+		Try to push the frame data in a file.
+		@param[in] data_in The data to save in a file. The data_in key is used to save the file.
 	*/
 	STOREDATA_RECORD_EXPORT int push_data(const std::map<int, std::vector<char> > &data_in);
 
@@ -182,8 +193,8 @@ public:
 	int framerate_;
 
 	// Get the properties from the camera
-	double width_;
-	double height_;
+	//double width_;
+	//double height_;
 
 	// Create a matrix to keep the retrieved frame
 	std::map<int, std::vector<char> > data_in_;

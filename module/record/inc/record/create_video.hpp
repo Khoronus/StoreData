@@ -16,7 +16,7 @@
 *
 * @author Alessandro Moro <alessandromoro.italy@gmail.com>
 * @bug No known bugs.
-* @version 0.4.0.0
+* @version 0.5.0.0
 *
 */
 
@@ -37,14 +37,16 @@ namespace storedata
 {
 
 /** @brief Class to capture video with a maximum size.
+
+	@previous_name VideoCaptureManager
 */
-class VideoCaptureManager
+class MemorizeVideoManager
 {
   public:
 
-	  STOREDATA_RECORD_EXPORT VideoCaptureManager();
+	  STOREDATA_RECORD_EXPORT MemorizeVideoManager();
 
-	  STOREDATA_RECORD_EXPORT ~VideoCaptureManager();
+	  STOREDATA_RECORD_EXPORT ~MemorizeVideoManager();
 
 	  /** @brief Release the allocated data
 	  */
@@ -154,14 +156,16 @@ private:
 
 
 /** @brief Class to manage the 
+
+	@previous_filename VideoGeneratorManager
 */
-class VideoGeneratorManager
+class VideoGeneratorManagerAsync
 {
 public:
 
-	STOREDATA_RECORD_EXPORT VideoGeneratorManager();
+	STOREDATA_RECORD_EXPORT VideoGeneratorManagerAsync();
 
-	STOREDATA_RECORD_EXPORT ~VideoGeneratorManager();
+	STOREDATA_RECORD_EXPORT ~VideoGeneratorManagerAsync();
 
 	/** @brief Setup the videos to memorize
 	*/
@@ -237,7 +241,7 @@ public:
 
 	/** @brief Create Video
 	*/
-	std::map<int, VideoCaptureManager* > video_;
+	std::map<int, MemorizeVideoManager* > video_;
 
 	/** @brief Count the number of frames that has to be memorized.
 	           It should avoid the use of the mutex.

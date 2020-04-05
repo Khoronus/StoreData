@@ -37,6 +37,8 @@ namespace storedata
 
 /** @brief Class to perform an async record of image sources and data 
            information as encoded image.
+
+	This class record images and binary data in a single frame.
 */
 class EnhanceAsyncRecorderManager {
 public:
@@ -101,11 +103,15 @@ public:
 	*/
 	STOREDATA_VIDEO_EXPORT void set_data_block_offset(int data_block_offset);
 
-	/** @brief It plays an avi with metadata
+	/** @brief It plays an avi with metadata.
+
+		The metadata is in the first frame of the video file.
+		@previous_name play_avi
 	*/
-	STOREDATA_VIDEO_EXPORT void play_avi(const std::string &fname);
+	STOREDATA_VIDEO_EXPORT bool read_video_with_meta_header(const std::string &fname);
 
 	/** @brief It plays an avi with metadata.
+
 		It plays an avi with metadata.
 		@param[in] fname Video file to open
 		@param[in] params List of parameters. 
@@ -115,13 +121,19 @@ public:
 			int data_block_offset = std::stoi(results[3]);
 			int image_width = std::stoi(results[4])
 			int image_height = std::stoi(results[5])
+		@param[in] do_skip_first_frame If true, it skips the first frame 
+		                              (i.e. meta header).
 	*/
-	STOREDATA_VIDEO_EXPORT void play_avi(const std::string &fname,
-		std::vector<std::string> &params);
+	STOREDATA_VIDEO_EXPORT bool read_video(const std::string &fname,
+		std::vector<std::string> &params, bool do_skip_first_frame);
 
-	/** @brief It displayes played data
+	/** @brief It displayes played data.
+
+		Virtual function called when a new frame is read.
+		Derivate function should implement this function in order to properly
+		manage the data.
 	*/
-	STOREDATA_VIDEO_EXPORT virtual int get_played_data(
+	STOREDATA_VIDEO_EXPORT virtual int get_read_data(
 		const cv::Mat &img, unsigned char *buf, size_t size);
 
 private:

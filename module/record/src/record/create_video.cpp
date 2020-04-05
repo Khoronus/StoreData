@@ -16,7 +16,7 @@
 *
 * @author Alessandro Moro <alessandromoro.italy@gmail.com>
 * @bug No known bugs.
-* @version 0.4.0.0
+* @version 0.5.0.0
 *
 */
 
@@ -26,18 +26,18 @@ namespace storedata
 {
 
 // ----------------------------------------------------------------------------
-VideoCaptureManager::VideoCaptureManager() {
+MemorizeVideoManager::MemorizeVideoManager() {
 }
 // ----------------------------------------------------------------------------
-VideoCaptureManager::~VideoCaptureManager() {
+MemorizeVideoManager::~MemorizeVideoManager() {
 	release();
 }
 // ----------------------------------------------------------------------------
-void VideoCaptureManager::release() {
+void MemorizeVideoManager::release() {
 	video_.release();
 }
 // ----------------------------------------------------------------------------
-void VideoCaptureManager::setup(unsigned int memory_max_allocable,
+void MemorizeVideoManager::setup(unsigned int memory_max_allocable,
 	const std::string &filename, 
 	int width, int height, int framerate) {
 
@@ -54,7 +54,7 @@ void VideoCaptureManager::setup(unsigned int memory_max_allocable,
 #endif
 }
 // ----------------------------------------------------------------------------
-void VideoCaptureManager::setup_metaframe(cv::Mat &meta_frame) {
+void MemorizeVideoManager::setup_metaframe(cv::Mat &meta_frame) {
 	meta_frame_ = meta_frame.clone();
 	// if the meta frame is not empty, add at the beginning
 	if (!meta_frame_.empty() &&
@@ -64,7 +64,7 @@ void VideoCaptureManager::setup_metaframe(cv::Mat &meta_frame) {
 	}
 }
 // ----------------------------------------------------------------------------
-int VideoCaptureManager::generate(const std::string &appendix) {
+int MemorizeVideoManager::generate(const std::string &appendix) {
 	if (!video_.isOpened())
 	{
 	//if (!video_) {
@@ -85,14 +85,14 @@ int VideoCaptureManager::generate(const std::string &appendix) {
 	return 0;
 }
 // ----------------------------------------------------------------------------
-int VideoCaptureManager::check_memory(const cv::Mat &image) {
+int MemorizeVideoManager::check_memory(const cv::Mat &image) {
 	if (frames_expected_allocated_ < frames_max_allocable_) {
 		return 1;
 	}
 	return 0;
 }
 // ----------------------------------------------------------------------------
-int VideoCaptureManager::push(const cv::Mat &image) {
+int MemorizeVideoManager::push(const cv::Mat &image) {
 	if (video_.isOpened()) {
 		if (check_memory(image)) {
 			cv::Mat image_tmp = image;
@@ -117,20 +117,20 @@ int VideoCaptureManager::push(const cv::Mat &image) {
 	return 0;
 }
 // ----------------------------------------------------------------------------
-void VideoCaptureManager::set_video_encoder(int video_encoder) {
+void MemorizeVideoManager::set_video_encoder(int video_encoder) {
 	video_encoder_ = video_encoder;
 }
 // ----------------------------------------------------------------------------
-VideoGeneratorManager::VideoGeneratorManager() {
+VideoGeneratorManagerAsync::VideoGeneratorManagerAsync() {
 	verbose_ = false;
 	under_writing_ = false;
 }
 // ----------------------------------------------------------------------------
-VideoGeneratorManager::~VideoGeneratorManager() {
+VideoGeneratorManagerAsync::~VideoGeneratorManagerAsync() {
 	close();
 }
 // ----------------------------------------------------------------------------
-int VideoGeneratorManager::setup(
+int VideoGeneratorManagerAsync::setup(
 	unsigned int max_memory_allocable_forvideo,
 	std::map<int, VideoGeneratorParams> &vgp, int framerate) {
 
@@ -157,7 +157,7 @@ int VideoGeneratorManager::setup(
 
 	// Create the video writer
 	for (auto it = vgp.begin(); it != vgp.end(); it++) {
-		video_[it->first] = new VideoCaptureManager();
+		video_[it->first] = new MemorizeVideoManager();
 		video_[it->first]->setup(max_memory_allocable_forvideo,
 			it->second.filename(), it->second.width(),
 			it->second.height(), framerate_);
@@ -171,17 +171,17 @@ int VideoGeneratorManager::setup(
 	return return_status;
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManager::setup_metaframe(cv::Mat &meta_frame) {
+void VideoGeneratorManagerAsync::setup_metaframe(cv::Mat &meta_frame) {
 	for (auto &it : video_) {
 		it.second->setup_metaframe(meta_frame);
 	}
 }
 // ----------------------------------------------------------------------------
-bool VideoGeneratorManager::under_writing() {
+bool VideoGeneratorManagerAsync::under_writing() {
 	return under_writing_;
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManager::procedure() {
+void VideoGeneratorManagerAsync::procedure() {
 
     boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
     if (lock) {
@@ -268,11 +268,11 @@ void VideoGeneratorManager::procedure() {
 	//--number_addframe_requests_;
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManager::check() {
+void VideoGeneratorManagerAsync::check() {
 	std::cout << "push " << under_writing_ << std::endl;//" " << number_addframe_requests_ << std::endl;
 }
 // ----------------------------------------------------------------------------
-int VideoGeneratorManager::push_data(const std::map<int, cv::Mat> &frame) {
+int VideoGeneratorManagerAsync::push_data(const std::map<int, cv::Mat> &frame) {
 	if (!under_writing_) {
 		boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
 		if (lock) {
@@ -282,14 +282,14 @@ int VideoGeneratorManager::push_data(const std::map<int, cv::Mat> &frame) {
 				frame_[it->first] = it->second.clone();
 			}
 			boost::thread* thr = new boost::thread(
-				boost::bind(&VideoGeneratorManager::procedure, this));
+				boost::bind(&VideoGeneratorManagerAsync::procedure, this));
 		}
 		return 1;
 	}
 	return 0;
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManager::close() {
+void VideoGeneratorManagerAsync::close() {
 	while (under_writing_ ){ //|| number_addframe_requests_ > 0) {
 		//std::cout << under_writing_ << " " << number_addframe_requests_ << std::endl;
 		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
@@ -301,11 +301,11 @@ void VideoGeneratorManager::close() {
 	video_.clear();
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManager::set_verbose(bool verbose) {
+void VideoGeneratorManagerAsync::set_verbose(bool verbose) {
 	verbose_ = verbose;
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManager::set_callback_createfile(
+void VideoGeneratorManagerAsync::set_callback_createfile(
 	cbk_fname_changed callback_createfile) {
 	callback_createfile_ = callback_createfile;
 }

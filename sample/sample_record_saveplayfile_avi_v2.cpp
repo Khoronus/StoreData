@@ -41,13 +41,16 @@
 #include "version/version.hpp"
 #include "../StoreData/StoreData.hpp"
 
+// Filename of the last saved file.
+std::string global_filename_record;
+
 // ----------------------------------------------------------------------------
 namespace
 {
 
 /** @brief Record the video scene
 */
-void record(bool do_save_avi) {
+void sample_record_async(bool do_save_avi) {
 	storedata::EnhanceAsyncRecorderManager earm;
 	earm.initialize_record("data\\", do_save_avi);
 	earm.set_kMaxFramesRecorded(900);
@@ -70,8 +73,12 @@ void record(bool do_save_avi) {
 			if (m.empty()) continue;
 			cv::imshow("m", m);
 			std::string msg = "frame_num: " + std::to_string(frame_num) + "|";
-			earm.record(m, 0, reinterpret_cast<const unsigned char*>(msg.c_str()),
+			float timestamp = frame_num * 0.03f;
+			earm.record(m, timestamp, 
+				reinterpret_cast<const unsigned char*>(msg.c_str()),
 				msg.size());
+			global_filename_record = earm.get_fname_record();
+
 			if (cv::waitKey(1) == 27) break;
 			++frame_num;
 		}
@@ -80,22 +87,31 @@ void record(bool do_save_avi) {
 
 /** @brief Play a dat file
 */
-void play_dat(const std::string &fname) {
+void sample_read_dat(const std::string &fname) {
 	// Record a video and save some simple data
 	storedata::PlayerRecorder pr;
 	unsigned int index_start = 0;
 	// play
 	pr.play(fname, 60);
+}
+
+
+/** @brief Play a dat file
+*/
+void sample_read_and_unpack_dat(const std::string &fname) {
+	// Record a video and save some simple data
+	storedata::PlayerRecorder pr;
+	unsigned int index_start = 0;
 	// unpack
 	pr.unpack(fname, 60,
-		"data\\", index_start);
+		"unpack\\", index_start);
 
 	std::cout << "Open the dat file unpacked" << std::endl;
 	// read the txt files
 	for (int i = 0; i < 100; ++i) {
-		cv::Mat img = cv::imread("data\\" + std::to_string(i) + ".jpg");
+		cv::Mat img = cv::imread("unpack\\" + std::to_string(i) + ".jpg");
 		if (img.empty()) continue;
-		std::ifstream f("data\\" + std::to_string(i) + ".txt", std::ios::binary | std::ios::ate);
+		std::ifstream f("unpack\\" + std::to_string(i) + ".txt", std::ios::binary | std::ios::ate);
 		if (f.is_open()) {
 			std::cout << "file: " << i << std::endl;
 			std::streamsize size = f.tellg();
@@ -121,154 +137,31 @@ void play_dat(const std::string &fname) {
 		cv::imshow("img", img);
 		cv::waitKey(1);
 	}
-
 }
 
-/** @brief Play a dat file
+
+/** @brief Example derivate class.
+
+	Example derivate class. The video and message data is only display for demo.
 */
-void play_avi(const std::string &fname) {
-	cv::VideoCapture vc(fname);
-	if (!vc.isOpened()) {
-		std::cout << "Unable to open: " << fname << std::endl;
-		return;
-	}
-	int data_block_size = 1;
-	int data_block_offset = 1;
-	size_t msg_len_max_bytes = 500;
-
-	cv::Mat tmp(480, 640, CV_8UC3);
-	//cv::Mat m_data_block(30, frame_width, CV_8UC3, cv::Scalar::all(0));
-	cv::Mat m_data_block;
-	storedata::codify::CodifyImage::estimate_data_size(tmp, msg_len_max_bytes, 
-		data_block_size, data_block_offset, m_data_block);
-
-	bool write_img = true;
-	if (vc.isOpened()) {
-		int num_frame = 0;
-		while (true)
-		{
-			cv::Mat m;
-			vc >> m;
-			if (m.empty()) {
-				break;
-			}
-			if (write_img) {
-				write_img = false;
-				cv::imwrite("m.png", m);
-			}
-			int x = data_block_offset, y = data_block_offset;
-
-			unsigned char data[2049];
-			size_t len = 0;
-			storedata::codify::CodifyImage::image2data(m(cv::Rect(0, tmp.rows, 
-				tmp.cols, m.rows - tmp.rows)), x, y, data_block_size, 
-				data_block_offset, sizeof(len), data, 2048, len);
-			// in this example data is consider as a string (but it it can be 
-			// anything)
-			data[len] = '\0';
-			std::string sData(reinterpret_cast<char*>(data));
-			std::cout << "data: " << sData << std::endl;
-			// save the data here
-			// show the image
-			cv::resize(m, m, cv::Size(512, 512));
-			cv::imshow("m", m);
-			if (cv::waitKey(1) == 27) break;
-		}
-	}
-
-}
-
-
-/** @brief Play a dat file
-*/
-void play_avi_v2(const std::string &fname) {
-	cv::VideoCapture vc(fname);
-	if (!vc.isOpened()) {
-		std::cout << "Unable to open: " << fname << std::endl;
-		return;
-	}
-	// read the meta frame
-	cv::Mat meta_frame;
-	vc >> meta_frame;
-
-	// Extract the parameters for the current video
-	std::string msg_meta_decoded;
-	int meta_data_block_size = 1;
-	int meta_data_block_offset = 1;
-	int meta_x = 0, meta_y = 0;
-	storedata::codify::CodifyImage::image2string(
-		meta_frame, meta_x, meta_y,
-		meta_data_block_size, meta_data_block_offset,
-		msg_meta_decoded);
-	std::cout << "msg_meta_decoded: " << msg_meta_decoded <<
-		std::endl;
-	std::istringstream iss(msg_meta_decoded);
-	std::vector<std::string> results(std::istream_iterator<std::string>{iss},
-		std::istream_iterator<std::string>());
-	//for (auto &it : results) {
-	//	std::cout << "res: " << it << std::endl;
-	//}
-	//cv::imshow("meta_frame", meta_frame);
-	//cv::waitKey(0);
-
-	// Initialize
-	int data_block_size = std::stoi(results[2]);
-	int data_block_offset = std::stoi(results[3]);
-	size_t shared_buffer_size = std::stoi(results[0]);
-	size_t msg_len_max_bytes = std::stoi(results[1]);
-	cv::Mat tmp(std::stoi(results[5]), std::stoi(results[4]), CV_8UC3);
-	cv::Mat m_data_block;
-	storedata::codify::CodifyImage::estimate_data_size(tmp, msg_len_max_bytes,
-		data_block_size, data_block_offset, m_data_block);
-	std::shared_ptr<unsigned char> shared_buffer = 
-		std::unique_ptr<unsigned char>(new unsigned char[shared_buffer_size]);
-
-	// Check the video
-	bool write_img = true;
-	if (vc.isOpened()) {
-		int num_frame = 0;
-		while (true)
-		{
-			cv::Mat m;
-			vc >> m;
-			if (m.empty()) {
-				break;
-			}
-			if (write_img) {
-				write_img = false;
-				cv::imwrite("m.png", m);
-			}
-			int x = data_block_offset, y = data_block_offset;
-
-			size_t len = 0;
-			storedata::codify::CodifyImage::image2data(m(cv::Rect(0, tmp.rows,
-				tmp.cols, m.rows - tmp.rows)), x, y, data_block_size,
-				data_block_offset, sizeof(len), shared_buffer.get(), shared_buffer_size - 1, len);
-			// in this example data is consider as a string (but it it can be 
-			// anything)
-			shared_buffer.get()[len] = '\0';
-			std::string sData(reinterpret_cast<char*>(shared_buffer.get()));
-			std::cout << "data: " << sData << std::endl;
-			// save the data here
-			// show the image
-			cv::resize(m, m, cv::Size(512, 512));
-			cv::imshow("m", m);
-			if (cv::waitKey(1) == 27) break;
-		}
-	}
-
-}
-
 class DerivateEARM : public storedata::EnhanceAsyncRecorderManager
 {
 public:
-	int get_played_data(
+
+	/** @brief Get played data
+	*/
+	int get_read_data(
 		const cv::Mat &img, 
 		unsigned char *buf, 
-		size_t size) {
+		size_t size) override {
 
-		std::cout << "DerivateEARM" << std::endl;
-		return 1;
+		cv::imshow("img", img);
+		std::string msg(reinterpret_cast<char*>(buf), size);
+		msg[size] = '\0';
+		std::cout << "DerivateEARM: " << msg << std::endl;
+
+		cv::waitKey(1);
+		return storedata::EnhanceAsyncRecorderManager::EARM_OK;
 	}
 };
 
@@ -284,11 +177,21 @@ int main(int argc, char *argv[], char *window_name)
 		std::cout << "DLL version mismatch" << std::endl;
 		return 0;
 	}
-	bool do_save_as_avi = true;
-	record(do_save_as_avi);
+	// Record the current webcam image
+	bool do_save_as_avi = false;
+	sample_record_async(do_save_as_avi);
 	//play_avi_v2("data\\2019_03_21_10_58_07.avi");
 	DerivateEARM dearm;
-	dearm.play_avi("data\\2019_03_21_10_58_07.avi");
+	std::string fname = "data\\" + global_filename_record + ".avi";
+	if (dearm.read_video_with_meta_header(fname) == 
+		storedata::EnhanceAsyncRecorderManager::EARM_ERROR) {
+		std::cout << "[-] read:" << fname << std::endl;
+		fname = "data\\" + global_filename_record + ".dat";
+		std::cout << "[!] Try to read:" << fname << std::endl;
+		sample_read_dat(fname);
+		cv::waitKey();
+		sample_read_and_unpack_dat(fname);
+	}
 
 	//play_dat("data\\2019_03_14_11_29_33.dat");
 	//play_avi("data\\2019_03_14_11_28_18.avi");

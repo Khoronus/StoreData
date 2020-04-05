@@ -341,6 +341,7 @@ void play_avi(const std::string &fname) {
 */
 int main(int argc, char *argv[], char *window_name)
 {
+	// DELETE THIS FILE
 	bool do_save_as_avi = false;
 	record(do_save_as_avi);
 

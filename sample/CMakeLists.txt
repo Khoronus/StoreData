@@ -51,15 +51,15 @@ CREATE_EXAMPLE(sample_codify_packunpackimages "sample_codify_packunpackimages" "
 CREATE_EXAMPLE(sample_logger "sample_logger" "logger")
 CREATE_EXAMPLE(sample_record_saveplayfile "sample_record_saveplayfile" "record;codify")
 CREATE_EXAMPLE(sample_record_saveplayfile_dat "sample_record_saveplayfile_dat" "record;codify")
-CREATE_EXAMPLE(sample_rawrecord "sample_rawrecord" "record;codify")
-CREATE_EXAMPLE(sample_rawrecord_serialized "sample_rawrecord_serialized" "record;codify")
+CREATE_EXAMPLE(sample_rawrecorder "sample_rawrecorder" "record;codify")
+CREATE_EXAMPLE(sample_rawrecorder_serialized "sample_rawrecorder_serialized" "record;codify")
 CREATE_EXAMPLE(sample_record_saveplayfile_avi "sample_record_saveplayfile_avi" "record;codify")
 CREATE_EXAMPLE(sample_record_saveplayfile_avi_v2 "sample_record_saveplayfile_avi_v2" "record;codify;video;StoreData")
 CREATE_EXAMPLE(sample_record_container "sample_record_container" "record")
 CREATE_EXAMPLE(sample_record_container_video "sample_record_container_video" "record")
 CREATE_EXAMPLE(sample_record_container_generic "sample_record_container_generic" "buffer;record")
 CREATE_EXAMPLE(sample_volatile_timed_buffer "sample_volatile_timed_buffer" "buffer;record")
-
+CREATE_EXAMPLE(sample_create_file "sample_create_file" "record")
 
 #######################################################################
 if (USE_STATIC)

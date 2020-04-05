@@ -35,4 +35,12 @@ sample_rawrecord.cpp
   Read binary data
 sample_rawrecord_serialized.cpp
   Record binary serialized (boost) data.
+
+
+
+create_file example
+create_video example
+combine create_file and create_video
+AtomicContainerData uses shared_ptr and move
+recordcontainervideo derivate of recordcontainer
   

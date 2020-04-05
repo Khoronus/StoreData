@@ -40,7 +40,7 @@
 namespace
 {
 
-/** @brief It records a video
+/** @brief It records a video and a message
 */
 int record() {
 	cv::VideoCapture vc(0);

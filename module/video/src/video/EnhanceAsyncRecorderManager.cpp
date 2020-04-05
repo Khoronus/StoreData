@@ -385,12 +385,12 @@ void EnhanceAsyncRecorderManager::set_data_block_offset(int data_block_offset) {
 	data_block_offset_ = data_block_offset;
 }
 // ----------------------------------------------------------------------------
-void EnhanceAsyncRecorderManager::play_avi(
+bool EnhanceAsyncRecorderManager::read_video_with_meta_header(
 	const std::string &fname) {
 	cv::VideoCapture vc(fname);
 	if (!vc.isOpened()) {
 		std::cout << "Unable to open: " << fname << std::endl;
-		return;
+		return EARM_ERROR;
 	}
 	// read the meta frame
 	cv::Mat meta_frame;
@@ -411,64 +411,16 @@ void EnhanceAsyncRecorderManager::play_avi(
 		std::istream_iterator<std::string>());
 	vc.release();
 
-	play_avi(fname, results);
-	return;
-
-	//// Initialize
-	//int data_block_size = std::stoi(results[2]);
-	//int data_block_offset = std::stoi(results[3]);
-	//size_t shared_buffer_size = std::stoi(results[0]);
-	//size_t msg_len_max_bytes = std::stoi(results[1]);
-	//cv::Mat tmp(std::stoi(results[5]), std::stoi(results[4]), CV_8UC3);
-	//cv::Mat m_data_block;
-	//storedata::codify::CodifyImage::estimate_data_size(tmp, msg_len_max_bytes,
-	//	data_block_size, data_block_offset, m_data_block);
-	//std::shared_ptr<unsigned char> shared_buffer =
-	//	std::unique_ptr<unsigned char>(new unsigned char[shared_buffer_size]);
-
-	//// Check the video
-	//bool write_img = true;
-	//if (vc.isOpened()) {
-	//	int num_frame = 0;
-	//	while (true)
-	//	{
-	//		cv::Mat m;
-	//		vc >> m;
-	//		if (m.empty()) {
-	//			break;
-	//		}
-	//		int x = data_block_offset, y = data_block_offset;
-
-	//		size_t len = 0;
-	//		storedata::codify::CodifyImage::image2data(m(cv::Rect(0, tmp.rows,
-	//			tmp.cols, m.rows - tmp.rows)), x, y, data_block_size,
-	//			data_block_offset, sizeof(len), shared_buffer.get(), shared_buffer_size - 1, len);
-
-	//		// callback with the information
-	//		if (!get_played_data(m(cv::Rect(0, tmp.rows,
-	//			tmp.cols, m.rows - tmp.rows)),
-	//			shared_buffer.get(), shared_buffer_size - 1)) break;
-
-	//		// in this example data is consider as a string (but it it can be 
-	//		// anything)
-	//		shared_buffer.get()[len] = '\0';
-	//		std::string sData(reinterpret_cast<char*>(shared_buffer.get()));
-	//		std::cout << "data: " << sData << std::endl;
-	//		// save the data here
-	//		// show the image
-	//		cv::resize(m, m, cv::Size(512, 512));
-	//		cv::imshow("m", m);
-	//		if (cv::waitKey(1) == 27) break;
-	//	}
-	//}
+	// Read the video with the parameters from the header
+	return read_video(fname, results, true);
 }
 // ----------------------------------------------------------------------------
-void EnhanceAsyncRecorderManager::play_avi(const std::string &fname,
-	std::vector<std::string> &params) {
+bool EnhanceAsyncRecorderManager::read_video(const std::string &fname,
+	std::vector<std::string> &params, bool do_skip_first_frame) {
 	cv::VideoCapture vc(fname);
 	if (!vc.isOpened()) {
 		std::cout << "Unable to open: " << fname << std::endl;
-		return;
+		return EARM_ERROR;
 	}
 
 	// Initialize
@@ -502,7 +454,7 @@ void EnhanceAsyncRecorderManager::play_avi(const std::string &fname,
 				data_block_offset, sizeof(len), shared_buffer.get(), shared_buffer_size - 1, len);
 
 			// callback with the information
-			if (!get_played_data(m(cv::Rect(0, 0,
+			if (!get_read_data(m(cv::Rect(0, 0,
 				tmp.cols, tmp.rows)),
 				shared_buffer.get(), shared_buffer_size - 1)) break;
 
@@ -518,12 +470,14 @@ void EnhanceAsyncRecorderManager::play_avi(const std::string &fname,
 			//if (cv::waitKey(1) == 27) break;
 		}
 	}
+
+	return EARM_OK;
 }
 // ----------------------------------------------------------------------------
-int EnhanceAsyncRecorderManager::get_played_data(
+int EnhanceAsyncRecorderManager::get_read_data(
 	const cv::Mat &img, unsigned char *buf, size_t size) {
 	std::cout << "EARM" << std::endl;
-	return 1;
+	return EARM_OK;
 }
 
 } // namespace storedata

@@ -225,7 +225,7 @@ void PlayerRecorder::play(const std::string &filename, int FPS) {
 		//memcpy(msg, &(it->second[384]), it->second.size() - 384);
 		//msg[it->second.size() - 384] = '\0';
 		//std::cout << "msg[" << it->second.size() << "]: " << msg << std::endl;
-		//cv::waitKey(1000 / _FPS);
+		cv::waitKey(1000 / _FPS);
 	}
 }
 // ----------------------------------------------------------------------------
