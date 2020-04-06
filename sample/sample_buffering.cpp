@@ -78,7 +78,7 @@ namespace
 {
 
 
-void test_record() {
+void test_recordcontainerfile_microbuffer() {
 	/** @brief Container with the data to record
 	*/
 	std::map<int, storedata::RecordContainerFile> record_container;
@@ -86,6 +86,7 @@ void test_record() {
 	*/
 	std::map<int, vb::VolatileTimedBuffer> small_buffer;
 
+	// Recorder ID
 	int id = 0;
 	// copy the secondary buffer in the primary recorder
 	std::vector<vb::PtrMicrobuffer> vptr;
@@ -107,13 +108,18 @@ void test_record() {
 	small_buffer[id].add_forceexpand(t_internal, 
 		std::make_shared<MicroBufferObjDerived>(MicroBufferObjDerived(fname, src)));
 
+	vptr.clear();
+	small_buffer[id].get_ptr_containers(100, vptr);
+	std::cout << "Transfer: " << vptr.size() << std::endl;
+	record_container[id].push(vptr);
+
 	// Clean size of the frame expire
 	small_buffer[id].clean(t_internal, save_frame_expire_time_sec);
 }
 
 /** @brief It record some image data
 */
-void test_record2() {
+void test_recordcontainerfile_mainbuffer() {
 
 	/** @brief Container with the data to record
 	*/
@@ -147,7 +153,7 @@ void test_record2() {
 */
 int main(int argc, char *argv[], char *window_name)
 {
-	test_record();
-	test_record2();
+	test_recordcontainerfile_microbuffer();
+	test_recordcontainerfile_mainbuffer();
 	return 0;
 }

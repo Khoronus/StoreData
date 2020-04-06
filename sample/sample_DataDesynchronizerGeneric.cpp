@@ -249,9 +249,55 @@ private:
 };
 
 
+/** @brief Container data to transfer data between threads. It copies the data.
+*/
+template <typename _Ty>
+struct AtomicContainerDataTest
+{
+	std::unique_ptr<_Ty> data;
+	size_t size_bytes;
+	AtomicContainerDataTest() : data(nullptr) {}
+	void getFrom(std::unique_ptr<_Ty> &src, size_t src_size_bytes) {
+		size_bytes = src_size_bytes;
+		data = std::move(src);
+	}
+	//void copyFrom(AtomicContainerDataTest &obj) {
+	//	if (data) dispose();
+	//	size_bytes = obj.size_bytes;
+	//	data = malloc(size_bytes);
+	//	memcpy(data, obj.data, obj.size_bytes);
+	//}
+};
+
+void test_atomic_container() {
+
+
+	cv::VideoCapture vc(0);
+	if (!vc.isOpened()) return;
+
+	bool continue_capture = true;
+	bool bufferize = false;
+	int num_frame = 0;
+	std::unique_ptr<cv::Mat> ptr;
+	while (continue_capture) {
+		ptr = std::unique_ptr<cv::Mat>(new cv::Mat());
+		vc >> *ptr.get();
+		if (ptr.get()->empty()) continue;
+
+		AtomicContainerDataTest<cv::Mat> acdt;
+		acdt.getFrom(ptr, 0);
+
+		if (ptr) cv::imshow("m", *ptr.get());
+		if (acdt.data) cv::imshow("t", *acdt.data.get());
+		cv::waitKey();
+	}
+}
+
 
 void main()
 {
+	test_atomic_container();
+	return;
 	//read_saved_data();
 	//return;
 	//test();

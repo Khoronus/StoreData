@@ -109,6 +109,12 @@ public:
 	*/
 	STOREDATA_RECORD_EXPORT void stop();
 
+	/** @brief It stops the thread and try to close the files.
+
+		If it succeeded to stop the thread, it closes the file.
+	*/
+	STOREDATA_RECORD_EXPORT void close(int num_iterations, int wait_ms);
+
 	/** @brief Thread used to save the current container of images
 	*/
 	STOREDATA_RECORD_EXPORT void internal_thread();

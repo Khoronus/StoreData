@@ -82,6 +82,56 @@ void RecordContainerVideo::close(int num_iterations, int wait_ms) {
 //-----------------------------------------------------------------------------
 void RecordContainerVideo::internal_thread() {
 
+	// save the microbuffered frames
+	// The buffer is not recorded in order. 
+	// It requires to read as
+	/*
+					for (std::vector<vb::PtrMicrobuffer>::reverse_iterator it = vptr.rbegin(); it != vptr.rend(); ++it) {
+					for (auto &it2 : **it) {
+						std::cout << "> " << it2.first << " " <<
+							static_cast<MicroBufferObjDerived*>(it2.second.get())->msg() << std::endl;
+						cv::imshow("m", static_cast<MicroBufferObjDerived*>(it2.second.get())->img());
+						cv::waitKey(1);
+					}
+				}
+
+	*/
+	while (container_microbuffer_.size() > 0) {
+		
+		// Digest the microbuffer (if it exist)
+		std::vector<vb::PtrMicrobuffer> vptr;
+		{
+			std::unique_lock<std::mutex> lk(mtx_);
+			if (container_microbuffer_.size() > 0) {
+				vptr = container_microbuffer_.front();
+				container_microbuffer_.pop();
+			}
+		}
+		// Save all the frames in the microbuffer
+		if (vptr.size() > 0) {
+			// Count the number of elements in the microbuffer
+			num_elems_microbuffer_approx_ = 0;
+			for (auto &it : vptr) {
+				num_elems_microbuffer_approx_ += it->size();
+			}
+			//std::cout << "Save microbuffer: " << vptr.size() << std::endl;
+			for (auto &it : vptr) {
+				for (auto &it2 : *it) {
+					//std::cout << "SaveMB: " << it2.second.first << std::endl;
+					//std::cout << "it2: " << it2.second.second.size() << std::endl;
+					if (it2.second &&
+						!static_cast<cv::Mat*>(it2.second->get_item(1))->empty()) {
+						cv::Mat img = *static_cast<cv::Mat*>(it2.second->get_item(1));
+						filevideo_push_frame(vw_, fname_root_ + ".avi", img);
+					}
+					// Decrease the counter
+					--num_elems_microbuffer_approx_;
+				}
+			}
+		}
+		num_elems_microbuffer_approx_ = 0;
+	}
+
 	is_running_ = true;
 	while (continue_save_) {
 

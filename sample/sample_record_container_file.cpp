@@ -155,14 +155,7 @@
 //}
 
 
-void main()
-{
-	//read_saved_data();
-	//return;
-	//test();
-	//test_binary("fname.data");
-	//return;
-
+void test_record_container_file() {
 	cv::VideoCapture vc(0);
 	if (!vc.isOpened()) return;
 
@@ -189,7 +182,7 @@ void main()
 			rcd0.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
 			record_container[0].push(fname, rcd0);
 			fname = "data\\F1_" + std::to_string(num_frame) + ".data";
-			
+
 			rcd1.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
 			record_container[0].push(fname, rcd1);
 			++num_frame;
@@ -209,15 +202,20 @@ void main()
 			break;
 		case 'p':
 			bufferize = false;
+			record_container[0].close(10, 100);
 			break;
 		}
 	}
 
 	record_container[0].set_save_boost(true);
-	for (auto &it : record_container) {
-		it.second.stop();
-		if (!it.second.wait_until_is_not_ready(100, 5)) {
-			std::cout << "Failed to stop " << it.first << std::endl;
-		}
-	}
+	record_container[0].close(10, 100);
+
+}
+
+
+//-----------------------------------------------------------------------------
+void main()
+{
+	// There seems no point in using the microbuffer to save the files
+	test_record_container_file();
 }

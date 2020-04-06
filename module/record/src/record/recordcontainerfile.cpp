@@ -71,8 +71,15 @@ void RecordContainerFile::stop() {
 	continue_save_ = false;
 	cond_.notify_one();
 }
+//-----------------------------------------------------------------------------
+void RecordContainerFile::close(int num_iterations, int wait_ms) {
+	stop();
+	wait_until_buffer_is_empty(num_iterations, wait_ms);
+	wait_until_is_not_ready(num_iterations, wait_ms);
+}
 ////-----------------------------------------------------------------------------
 //void RecordContainer::internal_thread() {
+// THIS FUNCTION DOES NOT SEEMS TO BE ANY VALID FOR THE FILE ANYMORE
 //	is_running_ = true;
 //	while (continue_save_) {
 //
