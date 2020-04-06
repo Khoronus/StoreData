@@ -64,12 +64,12 @@ public:
 
 		@previous record
 	*/
-	STOREDATA_RECORD_EXPORT void record_file(cv::Mat &curr, bool encoded, std::string &msg);
+	STOREDATA_RECORD_EXPORT bool record_file(cv::Mat &curr, bool encoded, std::string &msg);
 	/** @brief
 
 		@previous record
 	*/
-	STOREDATA_RECORD_EXPORT void record_file(cv::Mat &curr, bool encoded, unsigned char *msg, size_t msg_size);
+	STOREDATA_RECORD_EXPORT bool record_file(cv::Mat &curr, bool encoded, unsigned char *msg, size_t msg_size);
 
 	/** @brief Setup the recorder properties
 		

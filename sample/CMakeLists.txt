@@ -59,6 +59,7 @@ CREATE_EXAMPLE(sample_record_container_video "sample_record_container_video" "re
 CREATE_EXAMPLE(sample_DataDesynchronizerGeneric "sample_DataDesynchronizerGeneric" "buffer;record")
 CREATE_EXAMPLE(sample_volatile_timed_buffer "sample_volatile_timed_buffer" "buffer;record")
 CREATE_EXAMPLE(sample_create_file "sample_create_file" "record")
+CREATE_EXAMPLE(sample_create_video "sample_create_video" "record")
 
 #######################################################################
 if (USE_STATIC)

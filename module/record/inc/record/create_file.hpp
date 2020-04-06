@@ -45,19 +45,14 @@
 #include "record_defines.hpp"
 #include "storedata_time.hpp"
 #include "storedata_typedef.hpp"
+#include "create_base.hpp"
 
 namespace storedata
 {
 
-const int kSuccess = 1;
-const int kFail = 0;
-const int kOutOfMemory = -1;
-const int kDataIsEmpty = -2;
-const int kFileIsNotOpen = -3;
-
 /** @brief Class to memorize a file until memory is availeble.
 */
-class MemorizeFileManager
+class MemorizeFileManager : public MemorizeManagerBase
 {
   public:
 
@@ -67,7 +62,7 @@ class MemorizeFileManager
 
 	  /** @brief Release the current stream
 	  */
-	  STOREDATA_RECORD_EXPORT void release();
+	  STOREDATA_RECORD_EXPORT void release() override;
 
 	  /** @brief Setup the data
 
@@ -163,6 +158,7 @@ private:
 	modified.
 
 	@brief ThreadSafe
+	@Warning Data writing is not guarantee. Not feedback returned.
 */
 class FileGeneratorManagerAsync
 {
@@ -202,7 +198,8 @@ public:
 		@param[in] data_in The data to save in a file. The data_in key is used 
 		                   to select which file writer will be used.
 	*/
-	STOREDATA_RECORD_EXPORT int push_data_can_replace(const std::map<int, std::vector<char> > &data_in);
+	STOREDATA_RECORD_EXPORT int push_data_write_not_guarantee_can_replace(
+		const std::map<int, std::vector<char> > &data_in);
 
 	/** @brief Close the file
 	*/

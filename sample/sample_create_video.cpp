@@ -34,25 +34,23 @@
 
 /** @brief It tests the MemorizeFileManager (sync recorder)
 */
-void test_MemorizeFileManager() {
-	storedata::MemorizeFileManager mfm;
-	mfm.setup(200, "data\\MemorizeFileManager_", ".dat");
+void test_MemorizeVideoManager() {
+	storedata::MemorizeVideoManager mvm;
+	mvm.setup(100, "data\\MemorizeVideoManager_", 640, 480, 30);
 
 	int num_file = 0;
-	for (int i = 0; i < 100; ++i) {
-		std::string s = "This is the sample line " + std::to_string(i) + '\n';
-		std::vector<char> v;
-		std::copy(s.begin(), s.end(), std::back_inserter(v));
+	for (int i = 0; i < 255; ++i) {
+		cv::Mat m(480, 640, CV_8UC3, cv::Scalar::all(i));
 		
-		if (mfm.push(v) <= 0) {
+		if (mvm.push(m) <= 0) {
 			// release locked file
-			mfm.release();
+			mvm.release();
 			// try to generate a new file
 			std::cout << "[!] generate a new file:" << num_file << std::endl;
-			mfm.generate(std::to_string(num_file), false);
+			mvm.generate(std::to_string(num_file));
 			++num_file;
 			// push the data
-			if (mfm.push(v) <= 0) {
+			if (mvm.push(m) <= 0) {
 				std::cout << "[-] error in the file generation." << std::endl;
 			}
 		}
@@ -67,44 +65,46 @@ void name_changed(const std::string &fname) {
 
 /** @brief Test FileGeneratorManagerAsync
 */
-void test_FileGeneratorManagerAsync() {
+void test_VideoGeneratorManagerAsync() {
 
 	// File Generator manager
-	storedata::FileGeneratorManagerAsync fgm_;
+	storedata::VideoGeneratorManagerAsync vgm_;
 	// File Generator parameters
-	std::map<int, storedata::FileGeneratorParams> fgp_;
+	std::map<int, storedata::VideoGeneratorParams> vgp_;
 
 	std::cout << "insert FileGeneratorParam" << std::endl;
-	fgp_.insert(std::make_pair(0, storedata::FileGeneratorParams()));
-	std::string filename = "data\\FileGeneratorManagerAsync_";
-	std::string dot_ext = ".dat";
+	vgp_.insert(std::make_pair(0, storedata::VideoGeneratorParams()));
+	std::string filename = "data\\VideoGeneratorManagerAsync_";
 	std::cout << "filename: " << filename << std::endl;
-	fgp_[0].set_filename(filename);
-	fgp_[0].set_dot_extension(dot_ext);
+	vgp_[0].set_filename(filename);
+	vgp_[0].set_width(640);
+	vgp_[0].set_height(480);
 	unsigned int max_memory_allocable = 100000;
-	int record_framerate = 1000;
-	fgm_.setup(max_memory_allocable, fgp_, record_framerate);
-	fgm_.set_callback_createfile(std::bind(&name_changed, std::placeholders::_1));
+	int fps = 1000;
+	vgm_.setup(max_memory_allocable, vgp_, fps);
+	vgm_.set_callback_createfile(std::bind(&name_changed, std::placeholders::_1));
 
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 255; ++i) {
+		cv::Mat m(480, 640, CV_8UC3, cv::Scalar::all(i));
+
 		std::string s = "This is the sample line " + std::to_string(i) + '\n';
 		std::vector<char> v;
 		std::copy(s.begin(), s.end(), std::back_inserter(v));
 
-		if (!fgm_.under_writing()) {
+		if (!vgm_.under_writing()) {
 			// Prepare the container for the data to transmit
-			std::map<int, std::vector<char> > m_data;
-			m_data[0] = v;
-			if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { std::cout << "lost:" << i << std::endl; }
+			std::map<int, cv::Mat> m_data;
+			m_data[0] = m;
+			if (!vgm_.push_data_write_not_guarantee_can_replace(m_data)) { std::cout << "lost:" << i << std::endl; }
 		} else {
 			std::cout << "[-] writing: " << i << std::endl;
 		}
 	}
-	fgm_.close();
+	vgm_.close();
 }
 
 //-----------------------------------------------------------------------------
 void main() {
-	test_MemorizeFileManager();
-	test_FileGeneratorManagerAsync();
+	test_MemorizeVideoManager();
+	test_VideoGeneratorManagerAsync();
 }

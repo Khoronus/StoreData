@@ -153,7 +153,7 @@ int main(int argc, char *argv[], char *window_name)
 		record_raw();
 		// Record a video and save some simple data
 		storedata::RawRecorder pr;
-		pr.play("data\\record_2020_04_05_10_43_37.dat", 60);
+		pr.read_all_raw("data\\record_2020_04_05_10_43_37.dat", 60);
 	}
 
 	return 0;

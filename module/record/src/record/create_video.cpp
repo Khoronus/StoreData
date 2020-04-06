@@ -80,16 +80,16 @@ int MemorizeVideoManager::generate(const std::string &appendix) {
 			video_ << meta_frame_;
 			++frames_expected_allocated_;
 		}
-		return 1;
+		return kSuccess;
 	}
-	return 0;
+	return kFail;
 }
 // ----------------------------------------------------------------------------
 int MemorizeVideoManager::check_memory(const cv::Mat &image) {
 	if (frames_expected_allocated_ < frames_max_allocable_) {
-		return 1;
+		return kSuccess;
 	}
-	return 0;
+	return kFail;
 }
 // ----------------------------------------------------------------------------
 int MemorizeVideoManager::push(const cv::Mat &image) {
@@ -106,15 +106,14 @@ int MemorizeVideoManager::push(const cv::Mat &image) {
 			//image.channels();
 			// It considers only an image for each frame
 			++frames_expected_allocated_;
-			return 1;
-		}
-		else {
+			return kSuccess;
+		} else {
 			// out of memory
-			return -1;
+			return kOutOfMemory;
 		}
 	}
 	// The video is not allocated
-	return 0;
+	return kFail;
 }
 // ----------------------------------------------------------------------------
 void MemorizeVideoManager::set_video_encoder(int video_encoder) {
@@ -181,7 +180,9 @@ bool VideoGeneratorManagerAsync::under_writing() {
 	return under_writing_;
 }
 // ----------------------------------------------------------------------------
-void VideoGeneratorManagerAsync::procedure() {
+bool VideoGeneratorManagerAsync::procedure() {
+
+	bool result_out = false;
 
     boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
     if (lock) {
@@ -236,7 +237,10 @@ void VideoGeneratorManagerAsync::procedure() {
 			{
 				// Test the videos
 				if (video_.find(it->first) != video_.end()) {
-					video_[it->first]->push(it->second);
+					if (video_[it->first]->push(it->second) ==
+						kSuccess) {
+						result_out = true;
+					}
 				}
 			}
 
@@ -266,13 +270,19 @@ void VideoGeneratorManagerAsync::procedure() {
 		under_writing_ = false;
 	} 
 	//--number_addframe_requests_;
+
+	return result_out;
 }
 // ----------------------------------------------------------------------------
 void VideoGeneratorManagerAsync::check() {
 	std::cout << "push " << under_writing_ << std::endl;//" " << number_addframe_requests_ << std::endl;
 }
 // ----------------------------------------------------------------------------
-int VideoGeneratorManagerAsync::push_data(const std::map<int, cv::Mat> &frame) {
+int VideoGeneratorManagerAsync::push_data_write_not_guarantee_can_replace(
+	const std::map<int, cv::Mat> &frame) {
+
+	bool write_success = false;
+
 	if (!under_writing_) {
 		boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
 		if (lock) {
@@ -281,12 +291,16 @@ int VideoGeneratorManagerAsync::push_data(const std::map<int, cv::Mat> &frame) {
 			{
 				frame_[it->first] = it->second.clone();
 			}
+			write_success = true;
+		}
+		//boost::thread* thr = new boost::thread(
+		//	boost::bind(&FileGeneratorManagerAsync::procedure, this));
+		if (write_success) {
 			boost::thread* thr = new boost::thread(
 				boost::bind(&VideoGeneratorManagerAsync::procedure, this));
 		}
-		return 1;
 	}
-	return 0;
+	return write_success;
 }
 // ----------------------------------------------------------------------------
 void VideoGeneratorManagerAsync::close() {

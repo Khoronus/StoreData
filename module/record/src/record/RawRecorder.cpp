@@ -38,8 +38,8 @@ void RawRecorder::setup(const std::string &filename_root,
 	fgm_.setup(max_memory_allocable, fgp_, fps);
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::record(uint8_t* data, size_t len) {
-	if (fgm_.under_writing()) return;
+bool RawRecorder::record(uint8_t* data, size_t len) {
+	if (fgm_.under_writing()) return false;
 	// Add the information to transmit
 	size_t size_msg_data = len;
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -53,15 +53,16 @@ void RawRecorder::record(uint8_t* data, size_t len) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::record(void* data, size_t len) {
-	record(data, len);
+bool RawRecorder::record(void* data, size_t len) {
+	return record(data, len);
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::record(const void* data, size_t len) {
-	if (fgm_.under_writing()) return;
+bool RawRecorder::record(const void* data, size_t len) {
+	if (fgm_.under_writing()) return false;
 	// Add the information to transmit
 	size_t size_msg_data = len;
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -75,11 +76,12 @@ void RawRecorder::record(const void* data, size_t len) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::record(const std::vector<uint8_t> &data) {
-	if (fgm_.under_writing()) return;
+bool RawRecorder::record(const std::vector<uint8_t> &data) {
+	if (fgm_.under_writing()) return false;
 	// Add the information to transmit
 	size_t size_msg_data = data.size();
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -93,11 +95,12 @@ void RawRecorder::record(const std::vector<uint8_t> &data) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::record(const std::string &msg) {
-	if (fgm_.under_writing()) return;
+bool RawRecorder::record(const std::string &msg) {
+	if (fgm_.under_writing()) return false;
 	// Add the information to transmit
 	size_t size_msg_data = msg.size();
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -111,12 +114,13 @@ void RawRecorder::record(const std::string &msg) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
 template <typename _Ty>
-void RawRecorder::record_t(_Ty data, size_t len) {
-	if (fgm_.under_writing()) return;
+bool RawRecorder::record_t(_Ty data, size_t len) {
+	if (fgm_.under_writing()) return false;
 	// Add the information to transmit
 	size_t size_msg_data = len;
 	std::vector<char> info_to_transmit(size_msg_data);
@@ -130,11 +134,12 @@ void RawRecorder::record_t(_Ty data, size_t len) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::play(const std::string &filename, int FPS) {
-	std::cout << "RawRecorder::play:" << filename << std::endl;
+void RawRecorder::read_all_raw(const std::string &filename, int FPS) {
+	std::cout << "RawRecorder::read_all_raw:" << filename << std::endl;
 	int _FPS = (std::max)(1, FPS);
 	std::ifstream file(filename.c_str(),
 		std::ios::in | std::ios::binary | std::ios::ate);
@@ -186,7 +191,7 @@ void RawRecorder::read(const std::string &filename,
 	}
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::play_raw(const std::string &filename, int FPS) {
+void RawRecorder::read_all_raw_compressed(const std::string &filename, int FPS) {
 	int _FPS = (std::max)(1, FPS);
 	// Read the data
 	bool bPlayRecord = true;
@@ -351,8 +356,8 @@ void RawRecorder::set_callback_createfile(
 } // namespace storedata
 
 // explicit instantiation
-template STOREDATA_RECORD_EXPORT void storedata::RawRecorder::record_t<uint8_t*>(uint8_t*, size_t);
-template STOREDATA_RECORD_EXPORT void storedata::RawRecorder::record_t<char*>(char*, size_t);
-template STOREDATA_RECORD_EXPORT void storedata::RawRecorder::record_t<const char*>(const char*, size_t);
+template STOREDATA_RECORD_EXPORT bool storedata::RawRecorder::record_t<uint8_t*>(uint8_t*, size_t);
+template STOREDATA_RECORD_EXPORT bool storedata::RawRecorder::record_t<char*>(char*, size_t);
+template STOREDATA_RECORD_EXPORT bool storedata::RawRecorder::record_t<const char*>(const char*, size_t);
 
 

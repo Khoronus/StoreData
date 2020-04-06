@@ -562,14 +562,14 @@ int main(int argc, char *argv[], char *window_name)
 		record2();
 		// Record a video and save some simple data
 		storedata::RawRecorder pr;
-		pr.play("D:\\workspace\\work\\NHK\\D1Data\\D1Viewer\\vs2015x64\\code\\data\\record_2018-06-01.16_02_37.dat", 60);
+		pr.read_all_raw("D:\\workspace\\work\\NHK\\D1Data\\D1Viewer\\vs2015x64\\code\\data\\record_2018-06-01.16_02_37.dat", 60);
 	}
 
 	if (true) {
 		//record_rgbxyz();
 		//record_rgbxyz_multithread();
 		storedata::RawRecorder pr;
-		pr.play_raw("data\\record_2020_04_05_10_36_35.dat", 60);
+		pr.read_all_raw_compressed("data\\record_2020_04_05_10_36_35.dat", 60);
 
 	}
 

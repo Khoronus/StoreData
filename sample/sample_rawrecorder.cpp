@@ -111,7 +111,7 @@ int main(int argc, char *argv[], char *window_name)
 		storedata::RawRecorder pr;
 		std::string fname = "data_recordraw\\record_" + global_fname + ".dat";
 		std::cout << "[!] open: " << fname << std::endl;
-		pr.play(fname, 60);
+		pr.read_all_raw(fname, 60);
 	}
 
 	return 0;

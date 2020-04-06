@@ -32,6 +32,7 @@
 #include "storedata_typedef.hpp"
 #include "storedata_time.hpp"
 #include "record_defines.hpp"
+#include "create_base.hpp"
 
 namespace storedata
 {
@@ -40,7 +41,7 @@ namespace storedata
 
 	@previous_name VideoCaptureManager
 */
-class MemorizeVideoManager
+class MemorizeVideoManager : public MemorizeManagerBase
 {
   public:
 
@@ -50,7 +51,7 @@ class MemorizeVideoManager
 
 	  /** @brief Release the allocated data
 	  */
-	  STOREDATA_RECORD_EXPORT void release();
+	  STOREDATA_RECORD_EXPORT void release() override;
 
 	  /** @brief Setup the data
 	  */
@@ -190,13 +191,14 @@ public:
 	/** @brief Function to add the frames to videos. It is run in a separate
 	           thread.
 	*/
-	STOREDATA_RECORD_EXPORT void procedure();
+	STOREDATA_RECORD_EXPORT bool procedure();
 
 	STOREDATA_RECORD_EXPORT void check();
 
 	/** @brief Try to push the frame data in a video.
 	*/
-	STOREDATA_RECORD_EXPORT int push_data(const std::map<int, cv::Mat> &frame);
+	STOREDATA_RECORD_EXPORT int push_data_write_not_guarantee_can_replace(
+		const std::map<int, cv::Mat> &frame);
 
 	/** @brief Close the video
 	*/

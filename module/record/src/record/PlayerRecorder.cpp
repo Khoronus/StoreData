@@ -62,9 +62,9 @@ void PlayerRecorder::setup_metaframe(cv::Mat &meta_frame) {
 	vgm_.setup_metaframe(meta_frame);
 }
 // ----------------------------------------------------------------------------
-void PlayerRecorder::record_file(cv::Mat &curr, bool encoded, std::string &msg) {
+bool PlayerRecorder::record_file(cv::Mat &curr, bool encoded, std::string &msg) {
 
-	if (fgm_.under_writing()) return;
+	if (fgm_.under_writing()) return false;
 
 	// Container with the buffer data of the encoded image.
 	std::vector< std::vector< uchar > > v_buffer_;
@@ -115,16 +115,17 @@ void PlayerRecorder::record_file(cv::Mat &curr, bool encoded, std::string &msg) 
 	memcpy(&m_data[0][24], data, size_img_data);
 	memcpy(&m_data[0][24 + size_img_data], &info_to_transmit[0], 
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
-void PlayerRecorder::record_file(
+bool PlayerRecorder::record_file(
 	cv::Mat &curr, 
 	bool encoded, 
 	unsigned char *msg, 
 	size_t msg_size) {
 
-	if (fgm_.under_writing()) return;
+	if (fgm_.under_writing()) return false;
 
 	// Container with the buffer data of the encoded image.
 	std::vector< std::vector< uchar > > v_buffer_;
@@ -176,11 +177,12 @@ void PlayerRecorder::record_file(
 	memcpy(&m_data[0][24], data, size_img_data);
 	memcpy(&m_data[0][24 + size_img_data], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
+	return true;
 }
 // ----------------------------------------------------------------------------
 void PlayerRecorder::record_video(std::map<int, cv::Mat> &sources) {
-	vgm_.push_data(sources);
+	vgm_.push_data_write_not_guarantee_can_replace(sources);
 }
 // ----------------------------------------------------------------------------
 void PlayerRecorder::read_file(const std::string &filename, int FPS) {

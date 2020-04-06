@@ -269,28 +269,27 @@ void FileGeneratorManagerAsync::check() {
 		std::endl;//" " << number_addframe_requests_ << std::endl;
 }
 // ----------------------------------------------------------------------------
-int FileGeneratorManagerAsync::push_data_can_replace(
+int FileGeneratorManagerAsync::push_data_write_not_guarantee_can_replace(
 	const std::map<int, std::vector<char> > &data_in) {
 
 	bool write_success = false;
 
 #ifdef BOOST_BUILD
 	if (!under_writing_) {
-		{
-			boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
-			if (lock) {
-				//++number_addframe_requests_;
+		boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
+		if (lock) {
+			//++number_addframe_requests_;
 #if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
-				for (auto it = data_in.begin(); it != data_in.end(); it++)
+			for (auto it = data_in.begin(); it != data_in.end(); it++)
 #else
-				for (std::map<int, std::vector<char> >::const_iterator it = data_in.begin(); it != data_in.end(); it++)
+			for (std::map<int, std::vector<char> >::const_iterator it = data_in.begin(); it != data_in.end(); it++)
 #endif		
-				{
-					data_in_[it->first] = it->second;
-				}
-				write_success = true;
+			{
+				data_in_[it->first] = it->second;
 			}
+			write_success = true;
 		}
+
 		//boost::thread* thr = new boost::thread(
 		//	boost::bind(&FileGeneratorManagerAsync::procedure, this));
 		if (write_success) {

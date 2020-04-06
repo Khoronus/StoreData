@@ -43,7 +43,9 @@
 namespace storedata
 {
 
-/** @brief Class to record raw binary data
+/** @brief Class to record raw binary data.
+
+	@Warning Data writing is not guarantee. Not feedback returned.
 */
 class RawRecorder
 {
@@ -61,13 +63,13 @@ public:
 	STOREDATA_RECORD_EXPORT void setup(const std::string &filename_root,
 		int max_memory_allocable, int fps);
 
-	STOREDATA_RECORD_EXPORT void record(const std::string &msg);
-	STOREDATA_RECORD_EXPORT void record(const std::vector<uint8_t> &data);
-	STOREDATA_RECORD_EXPORT void record(uint8_t* data, size_t len);
-	STOREDATA_RECORD_EXPORT void record(void* data, size_t len);
-	STOREDATA_RECORD_EXPORT void record(const void* data, size_t len);
+	STOREDATA_RECORD_EXPORT bool record(const std::string &msg);
+	STOREDATA_RECORD_EXPORT bool record(const std::vector<uint8_t> &data);
+	STOREDATA_RECORD_EXPORT bool record(uint8_t* data, size_t len);
+	STOREDATA_RECORD_EXPORT bool record(void* data, size_t len);
+	STOREDATA_RECORD_EXPORT bool record(const void* data, size_t len);
 	template <typename _Ty>
-	STOREDATA_RECORD_EXPORT void record_t(_Ty data, size_t len);
+	STOREDATA_RECORD_EXPORT bool record_t(_Ty data, size_t len);
 
 	/** @brief It reads binary data and put in a container.
 
@@ -76,8 +78,13 @@ public:
 	STOREDATA_RECORD_EXPORT void read(const std::string &filename, 
 		std::vector< std::vector<uint8_t> > &data_info);
 
-	STOREDATA_RECORD_EXPORT void play(const std::string &filename, int FPS);
-	STOREDATA_RECORD_EXPORT void play_raw(const std::string &filename, int FPS);
+	/** @previous play
+	*/
+	STOREDATA_RECORD_EXPORT void read_all_raw(const std::string &filename, int FPS);
+
+	/** @previous play_raw
+	*/
+	STOREDATA_RECORD_EXPORT void read_all_raw_compressed(const std::string &filename, int FPS);
 
 	/** @brief It sets the callback for the function that create a new file
 	*/
