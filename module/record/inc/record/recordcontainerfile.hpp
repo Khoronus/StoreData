@@ -1,5 +1,5 @@
 /**
-* @file recordcontainer.hpp
+* @file recordcontainerfile.hpp
 * @brief Header of the defined class
 *
 * @section LICENSE
@@ -40,6 +40,7 @@
 
 #include "record_defines.hpp"
 
+
 //#define dWriteData(a, b) try { cv::imwrite(a, b); }                            \
 //                         catch(...) { std::cout << "Default exception"; }
 //
@@ -73,14 +74,24 @@
 //	}
 //};
 
-/** @brief Class to record all the frames currently captured
+namespace storedata
+{
+
+/** @brief Class to record all the binary files passed.
+
+	This class records all the frames passed. Data is buffered and it is
+	guarantee that all the data is recorded.
+	However, due to the lock and time to copy the data, events that happen
+	in real-time are not guarantee to be recorded.
+
+	@Important This class saves a file for each pushed data!
 */
-class RecordContainer : public RecordContainerBase
+class RecordContainerFile : public RecordContainerBase
 {
 
 public:
 
-	STOREDATA_RECORD_EXPORT RecordContainer();
+	STOREDATA_RECORD_EXPORT RecordContainerFile();
 
 	/** @brief It push a new frame to save
 	*/
@@ -179,7 +190,7 @@ private:
 	size_t num_elems_microbuffer_approx_;
 };
 
-
+} // namespace storedata
 
 
 #endif // STOREDATA_RECORD_RECORDCONTAINER_HPP__

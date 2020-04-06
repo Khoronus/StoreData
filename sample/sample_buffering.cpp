@@ -81,7 +81,7 @@ namespace
 void test_record() {
 	/** @brief Container with the data to record
 	*/
-	std::map<int, RecordContainer> record_container;
+	std::map<int, storedata::RecordContainerFile> record_container;
 	/** @brief Container with the small buffered data for margin
 	*/
 	std::map<int, vb::VolatileTimedBuffer> small_buffer;
@@ -117,7 +117,7 @@ void test_record2() {
 
 	/** @brief Container with the data to record
 	*/
-	std::map<int, RecordContainer> record_container;
+	std::map<int, storedata::RecordContainerFile> record_container;
 	int id = 0;
 
 	bool res = record_container[id].start();
@@ -132,7 +132,7 @@ void test_record2() {
 		std::string msg = "Buffering size: " +
 			std::to_string(record_container[id].size_about());
 		// Add the record to save on a separate thread
-		RecordContainerData rcd;
+		storedata::RecordContainerData rcd;
 		cv::Mat img(50, 50, CV_8UC3);
 		rcd.copyFrom(img.data, img.cols * img.rows * img.channels());
 		record_container[id].push("data\\" + std::to_string(i) + ".dat", rcd);

@@ -53,6 +53,9 @@
 
 //#define dWriteData(a, b) try { } catch(...){std::cout << "Default exception";}
 
+namespace storedata
+{
+
 /** @brief Class to record all the frames currently captured
 
 	This class records all the frames passed. Data is buffered and it is 
@@ -194,6 +197,7 @@ private:
 };
 
 
+} // namespace storedata
 
 
-#endif // STOREDATA_RECORD_
+#endif // STOREDATA_RECORD_RECORDCONTAINERVIDEO_HPP__

@@ -22,7 +22,10 @@
 
 #include "record/inc/record/recordcontainervideo.hpp"
 
- //-----------------------------------------------------------------------------
+namespace storedata
+{
+
+//-----------------------------------------------------------------------------
 RecordContainerVideo::RecordContainerVideo() {
 	num_threads_ = 0;
 	max_threads_ = 1;
@@ -186,9 +189,9 @@ bool RecordContainerVideo::wait_until_buffer_is_empty(
 	size_t num_iterations, 
 	int sleep_ms) {
 	for (size_t i = 0; i < num_iterations; ++i) {
-		std::cout << "iA: " << i << " " << (size_about() > 0) << " ";
+		//std::cout << "iA: " << i << " " << (size_about() > 0) << " ";
 		if (is_running() && (size_about() > 0)) {
-			std::cout << size_about() << std::endl;
+			//std::cout << size_about() << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
 		} else {
 			return true;
@@ -216,3 +219,5 @@ void RecordContainerVideo::filevideo_push_frame(cv::VideoWriter &vw,
 	}
 	vw << img;
 }
+
+} // namespace storedata

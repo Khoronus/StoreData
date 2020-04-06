@@ -1,4 +1,4 @@
-/* @file recordcontainer.cpp
+/* @file recordcontainerfile.cpp
  * @brief Main file with the example for the hog descriptor and visualization.
  *
  * @section LICENSE
@@ -20,17 +20,22 @@
  * 
  */
 
-#include "record/inc/record/recordcontainer.hpp"
+#include "record/inc/record/recordcontainerfile.hpp"
 
- //-----------------------------------------------------------------------------
-RecordContainer::RecordContainer() {
+namespace storedata
+{
+
+//-----------------------------------------------------------------------------
+RecordContainerFile::RecordContainerFile() {
 	num_threads_ = 0;
 	max_threads_ = 1;
 	is_running_ = false;
 	num_elems_microbuffer_approx_ = 0;
 }
 //-----------------------------------------------------------------------------
-void RecordContainer::push(const std::string &fname, RecordContainerData &rcd) {
+void RecordContainerFile::push(
+	const std::string &fname, 
+	RecordContainerData &rcd) {
 	{
 		std::lock_guard<std::mutex> lk(mtx_);
 		// Add the data
@@ -41,7 +46,7 @@ void RecordContainer::push(const std::string &fname, RecordContainerData &rcd) {
 	cond_.notify_one();
 }
 //-----------------------------------------------------------------------------
-void RecordContainer::push(std::vector<vb::PtrMicrobuffer> &vptr)
+void RecordContainerFile::push(std::vector<vb::PtrMicrobuffer> &vptr)
 {
 	{
 		std::lock_guard<std::mutex> lk(mtx_);
@@ -53,16 +58,16 @@ void RecordContainer::push(std::vector<vb::PtrMicrobuffer> &vptr)
 	cond_.notify_one();
 }
 //-----------------------------------------------------------------------------
-bool RecordContainer::start() {
+bool RecordContainerFile::start() {
 	std::lock_guard<std::mutex> lk(mtx_);
 	if (is_running_) return false;
 	continue_save_ = true;
-	std::thread t1(&RecordContainer::internal_thread, this);
+	std::thread t1(&RecordContainerFile::internal_thread, this);
 	t1.detach();
 	return true;
 }
 //-----------------------------------------------------------------------------
-void RecordContainer::stop() {
+void RecordContainerFile::stop() {
 	continue_save_ = false;
 	cond_.notify_one();
 }
@@ -160,7 +165,7 @@ void RecordContainer::stop() {
 //	is_running_ = false;
 //}
 //-----------------------------------------------------------------------------
-void RecordContainer::internal_thread() {
+void RecordContainerFile::internal_thread() {
 	is_running_ = true;
 	while (continue_save_) {
 
@@ -199,24 +204,26 @@ void RecordContainer::internal_thread() {
 	is_running_ = false;
 }
 //-----------------------------------------------------------------------------
-void RecordContainer::set_save_boost(bool save_boost) {
+void RecordContainerFile::set_save_boost(bool save_boost) {
 	std::lock_guard<std::mutex> lk(mtx_);
 	save_boost_ = save_boost;
 }
 //-----------------------------------------------------------------------------
-size_t RecordContainer::size_about() {
+size_t RecordContainerFile::size_about() {
 	return container_.size() + num_elems_microbuffer_approx_;
 }
 //-----------------------------------------------------------------------------
-size_t RecordContainer::size_about_micro() {
+size_t RecordContainerFile::size_about_micro() {
 	return container_microbuffer_.size();
 }
 //-----------------------------------------------------------------------------
-bool RecordContainer::is_running() {
+bool RecordContainerFile::is_running() {
 	return is_running_;
 }
 //-----------------------------------------------------------------------------
-bool RecordContainer::wait_until_is_not_ready(size_t num_iterations, int sleep_ms) {
+bool RecordContainerFile::wait_until_is_not_ready(
+	size_t num_iterations, 
+	int sleep_ms) {
 	for (size_t i = 0; i < num_iterations; ++i) {
 		if (is_running()) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
@@ -228,18 +235,20 @@ bool RecordContainer::wait_until_is_not_ready(size_t num_iterations, int sleep_m
 	return false;
 }
 //-----------------------------------------------------------------------------
-bool RecordContainer::wait_until_buffer_is_empty(
+bool RecordContainerFile::wait_until_buffer_is_empty(
 	size_t num_iterations, 
 	int sleep_ms) {
 	for (size_t i = 0; i < num_iterations; ++i) {
-		std::cout << "iA: " << i << " " << (size_about() > 0) << " ";
+		//std::cout << "iA: " << i << " " << (size_about() > 0) << " ";
 		if (is_running() && (size_about() > 0)) {
-			std::cout << size_about() << std::endl;
+			//std::cout << size_about() << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
-		}
-		else {
+		} else {
 			return true;
 		}
 	}
 	return false;
 }
+
+
+} // namespace storedata

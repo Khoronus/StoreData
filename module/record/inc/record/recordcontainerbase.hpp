@@ -50,6 +50,9 @@
 
 //#define dWriteData(a, b) try { } catch(...){std::cout << "Default exception";}
 
+namespace storedata
+{
+
 struct STOREDATA_RECORD_EXPORT RecordContainerData
 {
 	void* data;
@@ -103,6 +106,6 @@ public:
 };
 
 
+} // namespace storedata
 
-
-#endif // STOREDATA_RECORD_RECORDCONTAINER_HPP__
+#endif // STOREDATA_RECORD_RECORDCONTAINERBASE_HPP__

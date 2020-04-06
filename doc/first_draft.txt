@@ -64,3 +64,6 @@ NEG: - Loss of event in real world
      - Buffering can grow drastically
      - Data is copied
 PRO: - Guarantee all data is recorded
+
+RecordContainerVideo : It creates a single video file (OpenCV xvid format .avi file)
+RecordContainerFile (former RecordContainer) : It creates files. IMPORTANT: It saves a file for each pushed data

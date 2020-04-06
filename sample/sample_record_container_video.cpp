@@ -12,7 +12,7 @@ void main()
 
 	/** @brief Container with the data to record
 	*/
-	std::map<int, RecordContainerVideo> record_container;
+	std::map<int, storedata::RecordContainerVideo> record_container;
 	//record_container[0].set_fname_root("data\\sample_RecordContainerVideo");
 	//record_container[0].set_size_image(cv::Size(640, 480));
 
@@ -37,7 +37,7 @@ void main()
 			// [+] 20170812 Changed the record format
 			std::string fname = "data\\F0_" + std::to_string(num_frame_buffer);
 			// Add the record to save on a separate thread
-			RecordContainerData rcd0;
+			storedata::RecordContainerData rcd0;
 			rcd0.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
 			record_container[0].push(fname, rcd0);
 			++num_frame_buffer;
