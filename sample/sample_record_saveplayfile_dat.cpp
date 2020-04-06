@@ -61,7 +61,7 @@ int record() {
 	pr.set_callback_createfile(std::bind(&name_changed,
 		std::placeholders::_1));
 	//pr.setup("data\\record_", 100000000, 100);
-	pr.setup("data\\record_", 100000, 100);
+	pr.setup_file("data\\record_", ".dat", 100000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{
@@ -92,7 +92,7 @@ int record_raw() {
 	storedata::RawRecorder pr;
 	pr.set_callback_createfile(std::bind(&name_changed,
 		std::placeholders::_1));
-	pr.setup("data\\record_", 10000, 100);
+	pr.setup("data\\record_", ".dat", 10000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{

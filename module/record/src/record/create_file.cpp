@@ -169,7 +169,8 @@ bool FileGeneratorManagerAsync::procedure() {
 		td_ = (currentFrameTimestamp_ - nextFrameTimestamp_);
 
 		// wait for X microseconds until 1second/framerate time has passed after previous frame write
-		if (td_.total_microseconds() >= 1000000 / record_framerate_) {
+		if (record_framerate_ < 0 ||
+			td_.total_microseconds() >= 1000000 / record_framerate_) {
 
 			//	 determine time at start of write
 			initialLoopTimestamp_ = boost::posix_time::microsec_clock::local_time();
@@ -276,18 +277,20 @@ int FileGeneratorManagerAsync::push_data_write_not_guarantee_can_replace(
 
 #ifdef BOOST_BUILD
 	if (!under_writing_) {
-		boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
-		if (lock) {
-			//++number_addframe_requests_;
+		{
+			boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
+			if (lock) {
+				//++number_addframe_requests_;
 #if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
-			for (auto it = data_in.begin(); it != data_in.end(); it++)
+				for (auto it = data_in.begin(); it != data_in.end(); it++)
 #else
-			for (std::map<int, std::vector<char> >::const_iterator it = data_in.begin(); it != data_in.end(); it++)
+				for (std::map<int, std::vector<char> >::const_iterator it = data_in.begin(); it != data_in.end(); it++)
 #endif		
-			{
-				data_in_[it->first] = it->second;
+				{
+					data_in_[it->first] = it->second;
+				}
+				write_success = true;
 			}
-			write_success = true;
 		}
 
 		//boost::thread* thr = new boost::thread(

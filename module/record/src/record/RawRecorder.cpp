@@ -32,10 +32,16 @@ RawRecorder::~RawRecorder() {
 	fgm_.close();
 }
 // ----------------------------------------------------------------------------
-void RawRecorder::setup(const std::string &filename_root,
-	int max_memory_allocable, int fps) {
+void RawRecorder::setup(
+	const std::string &filename_root,
+	const std::string &dot_extension,
+	int max_memory_allocable, 
+	int record_framerate) {
+	
 	fgp_[0].set_filename(filename_root);
-	fgm_.setup(max_memory_allocable, fgp_, fps);
+	fgp_[0].set_dot_extension(dot_extension);
+
+	fgm_.setup(max_memory_allocable, fgp_, record_framerate);
 }
 // ----------------------------------------------------------------------------
 bool RawRecorder::record(uint8_t* data, size_t len) {
@@ -252,7 +258,7 @@ void RawRecorder::read_all_raw_compressed(const std::string &filename, int FPS) 
 		cv::Mat img0(s1, s0, CV_8UC3, cv::Scalar::all(0));
 		memcpy(img0.data, &(uncom[data_size]), sizeof(uchar) * s0 * s1 * img0.channels());
 		data_size += sizeof(uchar) * s0 * s1 * img0.channels();
-		cv::Mat img1(s1, s0, CV_32FC4, cv::Scalar::all(0));
+		cv::Mat img1(s1, s0, CV_32FC3, cv::Scalar::all(0));
 		memcpy(img1.data, &(uncom[data_size]), sizeof(float) * s0 * s1 * img1.channels());
 		data_size += sizeof(float) * s0 * s1 * img1.channels();
 

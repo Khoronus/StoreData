@@ -38,11 +38,23 @@ sample_rawrecord_serialized.cpp
 
 
 
-create_file example
-create_video example
+[x] create_file example
+[x] create_video example
 combine create_file and create_video
 AtomicContainerData uses shared_ptr and move
 recordcontainervideo derivate of recordcontainer
   
 
 recordcontainer and create_x(file/video) seems similar
+
+
+These classes do not guarantee that the data is recorder.
+NEG: - No guarantee data is recorded
+     - In some scenario no feedback if the data is recorded 
+PRO: - Data recorded after a minimum fix interval (data drop if too short time from previous record)
+     
+create_video create_file (core classes for recording binary/video files)
+PlayerRecorder (use create_video/create_file)
+RawRecorder (use create_file)
+EnhanceAsyncRecorderManager (use PlayerRecorder)
+  Derivate class from EnhanceAsyncRecorderManager to manage the recorded data.

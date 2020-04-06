@@ -40,97 +40,6 @@
 namespace
 {
 
-/** @brief It records a video and a message
-*/
-int record() {
-	cv::VideoCapture vc(0);
-	if (!vc.isOpened()) {
-		std::cout << "Unable to open the camera" << std::endl;
-		return 0;
-	}
-
-	storedata::PlayerRecorder pr;
-	pr.setup_file("data\\record_", ".dat", 100000000, 100);
-
-	while (true) //Show the image captured in the window and repeat
-	{
-		cv::Mat curr;
-		vc >> curr;
-		if (curr.empty()) continue;
-
-		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
-		pr.record_file(curr, 1, msg);
-
-		////////////////////////////////// Elaboration ////////////////////////////////////////
-		cv::imshow("curr", curr);
-		if (cv::waitKey(1) == 27) break;
-	}
-	return 0;
-}
-
-/** @brief It records a video with a raw recorder
-*/
-int record2() {
-	cv::VideoCapture vc(0);
-	if (!vc.isOpened()) {
-		std::cout << "Unable to open the camera" << std::endl;
-		return 0;
-	}
-
-	storedata::RawRecorder pr;
-	pr.setup("data\\record_", ".dat", 10000, 100);
-
-	while (true) //Show the image captured in the window and repeat
-	{
-		cv::Mat curr;
-		vc >> curr;
-		if (curr.empty()) continue;
-
-		//std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
-		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 " + std::to_string((float)rand() / RAND_MAX);
-		pr.record(msg);
-
-		////////////////////////////////// Elaboration ////////////////////////////////////////
-		cv::imshow("curr", curr);
-		if (cv::waitKey(1) == 27) break;
-	}
-	return 0;
-}
-
-/** @brief It records a video
-*/
-int record3() {
-	cv::VideoCapture vc(0);
-	if (!vc.isOpened()) {
-		std::cout << "Unable to open the camera" << std::endl;
-		return 0;
-	}
-
-	storedata::PlayerRecorder pr;
-	std::map<int, cv::Mat> sources;
-	sources[0] = cv::Mat(480, 640, CV_8UC3);
-	pr.setup_video(sources, "data\\record_", 30 * 10, 30, 30);
-
-	while (true) //Show the image captured in the window and repeat
-	{
-		cv::Mat curr;
-		vc >> curr;
-		if (curr.empty()) continue;
-
-		//std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
-		//pr.record(curr, 1, msg);
-
-		sources[0] = curr;
-		pr.record_video(sources);
-
-		////////////////////////////////// Elaboration ////////////////////////////////////////
-		cv::imshow("curr", curr);
-		if (cv::waitKey(1) == 27) break;
-	}
-	return 0;
-}
-
-
 /** @brief It creates a folder if necessary
 */
 void create_folder(const std::string &folder) {
@@ -146,50 +55,15 @@ void create_folder(const std::string &folder) {
 }
 
 
-void create_imagesource() {
-	cv::Mat img = cv::imread("D:\\workspace\\work\\ImPACT\\dev\\UDPKomatsu2Arm\\data\\0.jpg");
-	cv::Mat img0 = img(cv::Rect(0, 0, img.cols / 2, img.rows / 2));
-	cv::Mat img1 = img(cv::Rect(img.cols / 2, 0, img.cols / 2, img.rows / 2));
-	cv::Mat img2 = img(cv::Rect(0, img.rows/ 2, img.cols / 2, img.rows / 2));
-	cv::Mat img3 = img(cv::Rect(img.cols / 2, img.rows / 2, img.cols / 2, img.rows / 2));
-	cv::resize(img0, img0, cv::Size(2048, 2048));
-	cv::resize(img1, img1, cv::Size(2048, 2048));
-	cv::resize(img2, img2, cv::Size(2048, 2048));
-	cv::resize(img3, img3, cv::Size(2048, 2048));
-	cv::imwrite("0.jpg", img0);
-	cv::imwrite("1.jpg", img1);
-	cv::imwrite("2.jpg", img2);
-	cv::imwrite("3.jpg", img3);
+/** @brief Change the name of the file.
+
+Function from the callback
+*/
+std::string global_fname;
+void name_changed(const std::string &fname) {
+	std::cout << "name_changed: " << fname << std::endl;
+	global_fname = fname;
 }
-void create_robotfile() {
-	// Create a binary file where to save the received data
-	std::string str = "_test";
-	std::ofstream myFile;
-	myFile.open("data" + str + ".bin", std::ios::out | std::ios::binary);
-	char msg[64] = "UDPKomatsu2Arm v1.0.0 64byte";
-	myFile.write(msg, 64);
-
-	for (int i = 0; i < 100; ++i) {
-		std::ifstream f("D:\\workspace\\work\\ImPACT\\dev\\UDPKomatsu2Arm\\data\\" + std::to_string(i) + ".txt", std::ios::binary | std::ios::ate);
-		if (f.is_open()) {
-			std::cout << "file: " << i << std::endl;
-			std::streamsize size = f.tellg();
-			std::cout << "size: " << size << std::endl;
-			if (size >= 384) {
-				size = 384;
-				f.seekg(0, std::ios::beg);
-				std::vector<char> buffer(size);
-				if (f.read(buffer.data(), size))
-				{
-					/* worked! */
-					myFile.write(&buffer[0], size);
-				}
-			}
-		}
-	}
-
-}
-
 
 #ifdef DEF_LIB_ZLIB
 
@@ -215,7 +89,8 @@ void test_compress(
 
 
 
-
+/** @brief Compress some memory data (ZLIB)
+*/
 void compress_memory(void *in_data, size_t in_data_size, std::vector<uint8_t> &out_data)
 {
 	std::vector<uint8_t> buffer;
@@ -265,6 +140,8 @@ void compress_memory(void *in_data, size_t in_data_size, std::vector<uint8_t> &o
 }
 #endif // DEF_LIB_ZLIB
 
+/** @brief Record 
+*/
 int record_rgbxyz() {
 	cv::VideoCapture vc(0);
 	if (!vc.isOpened()) {
@@ -289,6 +166,8 @@ int record_rgbxyz() {
 #endif // DEF_LIB_ZLIB
 
 	storedata::RawRecorder pr;
+	pr.set_callback_createfile(std::bind(&name_changed,
+		std::placeholders::_1));
 	pr.setup("data\\record_", ".dat", 10000000, 100);
 
 	//Byte* compress = nullptr;
@@ -353,16 +232,6 @@ int record_rgbxyz() {
 	return 0;
 }
 
-
-/** @brief Change the name of the file.
-
-	Function from the callback
-*/
-std::string global_fname;
-void name_changed(const std::string &fname) {
-	std::cout << "name_changed: " << fname << std::endl;
-	global_fname = fname;
-}
 
 
 /** @brief Multithread version to record the data
@@ -485,93 +354,15 @@ int record_rgbxyz_multithread() {
 */
 int main(int argc, char *argv[], char *window_name)
 {
-	// code to read Komatsu robot data
-	//create_imagesource();
-	//return 0;
-	//create_robotfile();
-	//return 0;
-
-	create_folder("data");
-
-	// example to read the dat file
-	if (false) {
-		if (argc < 2) {
-			std::cout << "expected: " << argv[0] << " <fname_dat>" << std::endl;
-			return 0;
-		}
-		// Record a video and save some simple data
-		storedata::PlayerRecorder pr;
-		unsigned int index_start = 0;
-		pr.unpack(argv[1], 60,
-			"data\\", index_start);
-
-		std::cout << "Open the dat file unpacked" << std::endl;
-		UDPKomatsu2Arm udp_komatsu_2arm;
-
-		// read the txt files
-		for (int i = 0; i < 100; ++i) {
-			cv::Mat img = cv::imread("data\\" + std::to_string(i) + ".jpg");
-			if (img.empty()) continue;
-			std::ifstream f("data\\" + std::to_string(i) + ".txt", std::ios::binary | std::ios::ate);
-			if (f.is_open()) {
-				std::cout << "file: " << i << std::endl;
-				std::streamsize size = f.tellg();
-				std::cout << "size: " << size << std::endl;
-				if (size >= 384) {
-					size = 384;
-					f.seekg(0, std::ios::beg);
-					std::vector<char> buffer(size);
-					if (f.read(buffer.data(), size))
-					{
-						udp_komatsu_2arm.convert(buffer.data(), size);
-					}
-				}
-			}
-			cv::imshow("img", img);
-			cv::waitKey(1);
-		}
-
-
-		return 0;
-	}
-
-
-	// example to save video async
-	if (false) {
-		record3();
-		return 0;
-	}
-
-	// example to save/read video and message in binary file
-	if (false) {
-		// record a video
-		record();
-		// Record a video and save some simple data
-		//PlayerRecorder pr;
-		//pr.play("data\\record_2018-10-15.05_06_05.dat", 60);
-		
-		//pr.play("D:\\workspace\\work\\ImPACT\\dev\\BirdView\\vs2015x64\\sample\\record\\record_2018-10-16.03_00_42.dat", 60);
-		//unsigned int index_start = 0;
-		//pr.unpack("C:\\Users\\Moro\\Downloads\\20181024_impact_test\\record_2018-10-24.03_22_36.dat", 60,
-		//	"D:\\workspace\\work\\ImPACT\\dev\\UDPKomatsu2Arm\\data\\", index_start);
-	}
-
-	// record a video with a raw data saver
-	if (false)
 	{
-		record2();
-		// Record a video and save some simple data
+		record_rgbxyz();
 		storedata::RawRecorder pr;
-		pr.read_all_raw("D:\\workspace\\work\\NHK\\D1Data\\D1Viewer\\vs2015x64\\code\\data\\record_2018-06-01.16_02_37.dat", 60);
+		pr.read_all_raw_compressed("data\\record_" + global_fname + ".dat", 60);
 	}
-
-	if (true) {
-		//record_rgbxyz();
-		//record_rgbxyz_multithread();
+	{
+		record_rgbxyz_multithread();
 		storedata::RawRecorder pr;
-		pr.read_all_raw_compressed("data\\record_2020_04_05_10_36_35.dat", 60);
-
+		pr.read_all_raw_compressed("data\\record_" + global_fname + ".dat", 60);
 	}
-
 	return 0;
 }

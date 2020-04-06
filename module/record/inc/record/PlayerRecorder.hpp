@@ -58,8 +58,12 @@ public:
 
 	/** @brief Setup the recorder properties
 	*/
-	STOREDATA_RECORD_EXPORT void setup(const std::string &filename,
-		int max_memory_allocable, int fps);
+	STOREDATA_RECORD_EXPORT void setup_file(
+		const std::string &filename,
+		const std::string &dot_extension,
+		int max_memory_allocable, 
+		int record_framerate);
+
 	/** @brief
 
 		@previous record
@@ -78,12 +82,14 @@ public:
 		@param[in] filename Root filename
 		@param[in] max_frames_allocable Max number of frames for video
 		@param[in] fps Expected video fps
+		@param[in] record_framerate Expected minimum recording framerate (
+		                            data is drop if too fast)
 	*/
 	STOREDATA_RECORD_EXPORT void setup_video(
 		std::map<int, cv::Mat> &sources,
 		const std::string &filename,
 		int max_frames_allocable, 
-		int fps);
+		int fps, int record_framerate);
 	/** @brief Setup the meta frame. It is the first frame of each new video.
 
 		Setup the recorder properties. It is the first frame of each new video.

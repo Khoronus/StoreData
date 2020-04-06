@@ -1,4 +1,4 @@
-/* @file sample_rawrecord.cpp
+/* @file main.cpp
  * @brief Main file with the example for the hog descriptor and visualization.
  *
  * @section LICENSE
@@ -24,6 +24,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 #include <opencv2/opencv.hpp>
 
@@ -53,7 +55,7 @@ void create_folder(const std::string &folder) {
 
 /** @brief Change the name of the file.
 
-	Function from the callback
+Function from the callback
 */
 std::string global_fname;
 void name_changed(const std::string &fname) {
@@ -61,20 +63,20 @@ void name_changed(const std::string &fname) {
 	global_fname = fname;
 }
 
-/** @brief It records a video with a raw recorder
+/** @brief It records a video and a message
 */
-int record_raw() {
+int sample_PlayerRecorder_file_write() {
 	cv::VideoCapture vc(0);
 	if (!vc.isOpened()) {
 		std::cout << "Unable to open the camera" << std::endl;
 		return 0;
 	}
 
-	// Store the data recorded
-	storedata::RawRecorder pr;
+	storedata::PlayerRecorder pr;
 	pr.set_callback_createfile(std::bind(&name_changed,
 		std::placeholders::_1));
-	pr.setup("data_recordraw\\record_", ".dat", 10000, 100);
+	pr.setup_file("data\\record_PlayerRecorder_file_", ".dat", 
+		100000000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{
@@ -82,17 +84,46 @@ int record_raw() {
 		vc >> curr;
 		if (curr.empty()) continue;
 
-		//std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
-		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 " + std::to_string((float)rand() / RAND_MAX);
-		pr.record(msg);
+		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
+		pr.record_file(curr, 1, msg);
 
 		////////////////////////////////// Elaboration ////////////////////////////////////////
 		cv::imshow("curr", curr);
 		if (cv::waitKey(1) == 27) break;
 	}
-
 	return 0;
 }
+
+/** @brief It records a video
+*/
+int sample_PlayerRecorder_video_write() {
+	cv::VideoCapture vc(0);
+	if (!vc.isOpened()) {
+		std::cout << "Unable to open the camera" << std::endl;
+		return 0;
+	}
+
+	storedata::PlayerRecorder pr;
+	std::map<int, cv::Mat> sources;
+	sources[0] = cv::Mat(480, 640, CV_8UC3);
+	pr.setup_video(sources, "data\\record_PlayerRecorder_video_", 30 * 10, 30, 30);
+
+	while (true) //Show the image captured in the window and repeat
+	{
+		cv::Mat curr;
+		vc >> curr;
+		if (curr.empty()) continue;
+
+		sources[0] = curr;
+		pr.record_video(sources);
+
+		////////////////////////////////// Elaboration ////////////////////////////////////////
+		cv::imshow("curr", curr);
+		if (cv::waitKey(1) == 27) break;
+	}
+	return 0;
+}
+
 
 } // namespace anonymous
 
@@ -100,18 +131,24 @@ int record_raw() {
 */
 int main(int argc, char *argv[], char *window_name)
 {
-	create_folder("data_recordraw");
+	create_folder("data");
 	create_folder("unpack");
 
-	// record a video with a raw data saver
-	if (true)
+	// example to save/read video and message in binary file
 	{
-		record_raw();
+		// record a video
+		sample_PlayerRecorder_file_write();
 		// Record a video and save some simple data
-		storedata::RawRecorder pr;
-		std::string fname = "data_recordraw\\record_" + global_fname + ".dat";
-		std::cout << "[!] open: " << fname << std::endl;
-		pr.read_all_raw(fname, 60);
+		storedata::PlayerRecorder pr;
+		//global_fname = "2020_04_06_03_27_01";
+		pr.read_file("data\\record_PlayerRecorder_file_" + global_fname + ".dat", 60);
+		unsigned int index_start = 0;
+		pr.unpack("data\\record_PlayerRecorder_file_" + global_fname + ".dat", 60, "unpack", index_start);
+	}
+
+	// example to save video async
+	{
+		sample_PlayerRecorder_video_write();
 	}
 
 	return 0;

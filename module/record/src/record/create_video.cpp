@@ -131,12 +131,13 @@ VideoGeneratorManagerAsync::~VideoGeneratorManagerAsync() {
 // ----------------------------------------------------------------------------
 int VideoGeneratorManagerAsync::setup(
 	unsigned int max_memory_allocable_forvideo,
-	std::map<int, VideoGeneratorParams> &vgp, int framerate) {
+	std::map<int, VideoGeneratorParams> &vgp, 
+	int record_framerate) {
 
 	int return_status = 1;
 
 	// set framerate to record and capture at
-	framerate_ = framerate;
+	record_framerate_ = record_framerate;
 
 	// initialize initial timestamps
 	nextFrameTimestamp_ = boost::posix_time::microsec_clock::local_time();
@@ -159,7 +160,7 @@ int VideoGeneratorManagerAsync::setup(
 		video_[it->first] = new MemorizeVideoManager();
 		video_[it->first]->setup(max_memory_allocable_forvideo,
 			it->second.filename(), it->second.width(),
-			it->second.height(), framerate_);
+			it->second.height(), it->second.video_framerate());
 		if (!video_[it->first]->generate(appendix)) {
 			return_status = 0;
 		}
@@ -193,7 +194,8 @@ bool VideoGeneratorManagerAsync::procedure() {
 		td_ = (currentFrameTimestamp_ - nextFrameTimestamp_);
 
 		// wait for X microseconds until 1second/framerate time has passed after previous frame write
-		if (td_.total_microseconds() >= 1000000 / framerate_){
+		if (record_framerate_ < 0 ||
+			td_.total_microseconds() >= 1000000 / record_framerate_){
 
 			//	 determine time at start of write
 			initialLoopTimestamp_ = boost::posix_time::microsec_clock::local_time();
@@ -251,7 +253,7 @@ bool VideoGeneratorManagerAsync::procedure() {
 
 			// add 1second/framerate time for next loop pause
 			nextFrameTimestamp_ = nextFrameTimestamp_ + 
-				boost::posix_time::microsec(1000000 / framerate_);
+				boost::posix_time::microsec(1000000 / record_framerate_);
 
 			// reset time_duration so while loop engages
 			td_ = (currentFrameTimestamp_ - nextFrameTimestamp_);
@@ -284,14 +286,16 @@ int VideoGeneratorManagerAsync::push_data_write_not_guarantee_can_replace(
 	bool write_success = false;
 
 	if (!under_writing_) {
-		boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
-		if (lock) {
-			//++number_addframe_requests_;
-			for (auto it = frame.begin(); it != frame.end(); it++)
-			{
-				frame_[it->first] = it->second.clone();
+		{
+			boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
+			if (lock) {
+				//++number_addframe_requests_;
+				for (auto it = frame.begin(); it != frame.end(); it++)
+				{
+					frame_[it->first] = it->second.clone();
+				}
+				write_success = true;
 			}
-			write_success = true;
 		}
 		//boost::thread* thr = new boost::thread(
 		//	boost::bind(&FileGeneratorManagerAsync::procedure, this));

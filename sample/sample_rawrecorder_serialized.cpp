@@ -249,7 +249,7 @@ int record_raw() {
 	storedata::RawRecorder pr;
 	pr.set_callback_createfile(std::bind(&name_changed,
 		std::placeholders::_1));
-	pr.setup("data_recordraw\\record_", 1000000000, 100);
+	pr.setup("data_recordraw\\record_", ".dat", 1000000000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{

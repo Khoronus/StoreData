@@ -60,8 +60,11 @@ public:
 		@param[in] filename_root The filename that is used as root for the new 
 		           file. i.e. Record_
 	*/
-	STOREDATA_RECORD_EXPORT void setup(const std::string &filename_root,
-		int max_memory_allocable, int fps);
+	STOREDATA_RECORD_EXPORT void setup(
+		const std::string &filename_root,
+		const std::string &dot_extension,
+		int max_memory_allocable, 
+		int record_framerate);
 
 	STOREDATA_RECORD_EXPORT bool record(const std::string &msg);
 	STOREDATA_RECORD_EXPORT bool record(const std::vector<uint8_t> &data);

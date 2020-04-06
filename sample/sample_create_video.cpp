@@ -79,9 +79,10 @@ void test_VideoGeneratorManagerAsync() {
 	vgp_[0].set_filename(filename);
 	vgp_[0].set_width(640);
 	vgp_[0].set_height(480);
+	vgp_[0].set_video_framerate(30);
 	unsigned int max_memory_allocable = 100000;
-	int fps = 1000;
-	vgm_.setup(max_memory_allocable, vgp_, fps);
+	int record_framerate = 1000;
+	vgm_.setup(max_memory_allocable, vgp_, record_framerate);
 	vgm_.set_callback_createfile(std::bind(&name_changed, std::placeholders::_1));
 
 	for (int i = 0; i < 255; ++i) {

@@ -26,21 +26,24 @@ namespace storedata
 {
 
 // ----------------------------------------------------------------------------
-void PlayerRecorder::setup(const std::string &filename,
-	int max_memory_allocable, int fps) {
+void PlayerRecorder::setup_file(
+	const std::string &filename,
+	const std::string &dot_extension,
+	int max_memory_allocable, int record_framerate) {
 	std::cout << "PlayerRecorder::setup" << std::endl;
 	std::cout << "insert FileGeneratorParam" << std::endl;
 	fgp_.insert(std::make_pair(0, FileGeneratorParams()));
 	std::cout << "filename: " << filename << std::endl;
 	fgp_[0].set_filename(filename);
+	fgp_[0].set_dot_extension(dot_extension);
 	std::cout << "PlayerRecorder::setup:" << max_memory_allocable << " " << 
-		fps << std::endl;
-	fgm_.setup(max_memory_allocable, fgp_, fps);
+		record_framerate << std::endl;
+	fgm_.setup(max_memory_allocable, fgp_, record_framerate);
 }
 // ----------------------------------------------------------------------------
 void PlayerRecorder::setup_video(std::map<int, cv::Mat> &sources,
 	const std::string &filename,
-	int max_frames_allocable, int fps) {
+	int max_frames_allocable, int fps, int record_framerate) {
 	std::cout << "PlayerRecorder::setup_video" << std::endl;
 	std::cout << "insert VideoGeneratorParam" << std::endl;
 	for (auto &it : sources) {
@@ -52,10 +55,11 @@ void PlayerRecorder::setup_video(std::map<int, cv::Mat> &sources,
 		vgp_[it.first].set_filename(filename);
 		vgp_[it.first].set_width(width); 
 		vgp_[it.first].set_height(height);
+		vgp_[it.first].set_video_framerate(fps);
 	}
 	std::cout << "PlayerRecorder::setup:" << max_frames_allocable << " " <<
 		fps << std::endl;
-	vgm_.setup(max_frames_allocable, vgp_, fps);
+	vgm_.setup(max_frames_allocable, vgp_, record_framerate);
 }
 // ----------------------------------------------------------------------------
 void PlayerRecorder::setup_metaframe(cv::Mat &meta_frame) {

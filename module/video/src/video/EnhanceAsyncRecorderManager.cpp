@@ -35,6 +35,7 @@ EnhanceAsyncRecorderManager::EnhanceAsyncRecorderManager() {
 	data_block_size_ = 1;
 	data_block_offset_ = 1;
 	fps_ = 30;
+	record_framerate_ = 30;
 	shared_buffer_size_ = 0;
 }
 // ----------------------------------------------------------------------------
@@ -60,7 +61,7 @@ void EnhanceAsyncRecorderManager::initialize_record(
 	// 1 GB for each file (now 100MB)
 	do_save_avi_ = do_save_avi;
 	if (!do_save_avi_) {
-		player_recorder_.setup(fname, 100000000, 100);
+		player_recorder_.setup_file(fname, ".dat", 100000000, 100);
 	}
 	done_ = true;
 	raw_data_ = new unsigned char[2048];
@@ -188,7 +189,7 @@ EnhanceAsyncRecorderManager::EARM EnhanceAsyncRecorderManager::record(
 					//std::cout << "inti_recorder: " << fname_video_path_ << std::endl;
 					is_initialize_recorder_ = true;
 					player_recorder_.setup_video(sources, 
-						fname_video_path_, kMaxFramesRecorded_, fps_);
+						fname_video_path_, kMaxFramesRecorded_, fps_, fps_);
 					player_recorder_.setup_metaframe(meta_frame);
 				}
 				// record the source
@@ -322,7 +323,7 @@ EnhanceAsyncRecorderManager::EARM EnhanceAsyncRecorderManager::record(
 					//std::cout << "inti_recorder: " << fname_video_path_ << std::endl;
 					is_initialize_recorder_ = true;
 					player_recorder_.setup_video(sources,
-						fname_video_path_, kMaxFramesRecorded_, fps_);
+						fname_video_path_, kMaxFramesRecorded_, fps_, record_framerate_);
 					player_recorder_.setup_metaframe(meta_frame);
 				}
 				// record the source
@@ -375,6 +376,10 @@ void EnhanceAsyncRecorderManager::set_msg_len_max_bytes(size_t msg_len_max_bytes
 // ----------------------------------------------------------------------------
 void EnhanceAsyncRecorderManager::set_fps(int fps) {
 	fps_ = fps;
+}
+// ----------------------------------------------------------------------------
+void EnhanceAsyncRecorderManager::set_record_framerate(int record_framerate) {
+	record_framerate_ = record_framerate;
 }
 // ----------------------------------------------------------------------------
 void EnhanceAsyncRecorderManager::set_data_block_size(int data_block_size) {

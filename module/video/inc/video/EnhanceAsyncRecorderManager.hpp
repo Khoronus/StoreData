@@ -95,6 +95,10 @@ public:
 	*/
 	STOREDATA_VIDEO_EXPORT void set_fps(int fps);
 
+	/** @brief Set expected video fps
+	*/
+	STOREDATA_VIDEO_EXPORT void set_record_framerate(int record_framerate);
+
 	/** @brief Set Data block size (number of pixels to define 1 bit)
 	*/
 	STOREDATA_VIDEO_EXPORT void set_data_block_size(int data_block_size);
@@ -201,6 +205,10 @@ private:
 	/** @brief Expected video fps
 	*/
 	int fps_;
+
+	/** @brief Expected record framerate
+	*/
+	int record_framerate_;
 
 	/** @brief Function called when a new file is created
 	*/

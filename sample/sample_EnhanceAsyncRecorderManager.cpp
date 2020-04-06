@@ -57,6 +57,7 @@ void sample_record_async(bool do_save_avi) {
 	earm.set_shared_buffer_size(2048);
 	earm.set_msg_len_max_bytes(500);
 	earm.set_fps(30);
+	earm.set_record_framerate(30);
 	earm.set_data_block_size(1);
 	earm.set_data_block_offset(1);
 

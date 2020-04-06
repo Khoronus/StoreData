@@ -148,11 +148,19 @@ public:
 	int width() {
 		return width_;
 	}
+	void set_video_framerate(int video_framerate) {
+		video_framerate_ = video_framerate;
+	}
+	int video_framerate() {
+		return video_framerate_;
+	}
+
 private:
 
 	std::string filename_;
 	int width_;
 	int height_;
+	int video_framerate_;
 };
 
 
@@ -172,7 +180,7 @@ public:
 	*/
 	STOREDATA_RECORD_EXPORT int setup(
 		unsigned int max_memory_allocable_forvideo,
-		std::map<int, VideoGeneratorParams> &vgp, int framerate);
+		std::map<int, VideoGeneratorParams> &vgp, int record_framerate);
 
 	/** @brief Setup the meta frame. It is the first frame of each new video.
 
@@ -224,12 +232,13 @@ public:
 	*/
 	bool under_writing_;
 
-	// set framerate to record and capture at
-	int framerate_;
+	// set framerate to record 
+	int record_framerate_;
 
 	// Get the properties from the camera
 	double width_;
 	double height_;
+	int video_framerate_;
 
 	// Create a matrix to keep the retrieved frame
 	std::map<int, cv::Mat> frame_;
