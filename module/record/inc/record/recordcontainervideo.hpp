@@ -38,24 +38,29 @@
 #include "logger/inc/logger/log.hpp"
 
 #include "record_defines.hpp"
-#include "recordcontainer.hpp"
+#include "recordcontainerbase.hpp"
 #include "codify/codify.hpp"
 #include "storedata_time.hpp"
 
 //#define dWriteData(a, b) try { cv::imwrite(a, b); }                            \
 //                         catch(...) { std::cout << "Default exception"; }
 
-#define dWriteData(a, b) try { 	FILE *fp; \
-                         fp = fopen(a.c_str(), "w"); \
-                         fwrite(b.data, 1, b.size_bytes, fp); \
-                         fclose(fp); }                   \
-                         catch(...) { std::cout << "Default exception"; }
+//#define dWriteData(a, b) try { 	FILE *fp; \
+//                         fp = fopen(a.c_str(), "w"); \
+//                         fwrite(b.data, 1, b.size_bytes, fp); \
+//                         fclose(fp); }                   \
+//                         catch(...) { std::cout << "Default exception"; }
 
 //#define dWriteData(a, b) try { } catch(...){std::cout << "Default exception";}
 
 /** @brief Class to record all the frames currently captured
+
+	This class records all the frames passed. Data is buffered and it is 
+	guarantee that all the data is recorded.
+	However, due to the lock and time to copy the data, events that happen
+	in real-time are not guarantee to be recorded.
 */
-class RecordContainerVideo
+class RecordContainerVideo : public RecordContainerBase
 {
 
 public:
@@ -77,6 +82,12 @@ public:
 	/** @brief It stops the thread
 	*/
 	STOREDATA_RECORD_EXPORT void stop();
+
+	/** @brief It stops the thread and try to close the files.
+
+		If it succeeded to stop the thread, it closes the file.
+	*/
+	STOREDATA_RECORD_EXPORT void close(int num_iterations, int wait_ms);
 
 	/** @brief Thread used to save the current container of images
 	*/

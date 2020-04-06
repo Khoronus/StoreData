@@ -67,6 +67,16 @@ void RecordContainerVideo::stop() {
 	cond_.notify_one();
 }
 //-----------------------------------------------------------------------------
+void RecordContainerVideo::close(int num_iterations, int wait_ms) {
+	stop();
+	if (wait_until_buffer_is_empty(num_iterations, wait_ms) &&
+		wait_until_is_not_ready(num_iterations, wait_ms)) {
+		vw_.release();
+		fout_.close();
+		fout_.clear();
+	}
+}
+//-----------------------------------------------------------------------------
 void RecordContainerVideo::internal_thread() {
 
 	is_running_ = true;
@@ -180,8 +190,7 @@ bool RecordContainerVideo::wait_until_buffer_is_empty(
 		if (is_running() && (size_about() > 0)) {
 			std::cout << size_about() << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
-		}
-		else {
+		} else {
 			return true;
 		}
 	}

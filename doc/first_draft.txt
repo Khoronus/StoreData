@@ -58,3 +58,9 @@ PlayerRecorder (use create_video/create_file)
 RawRecorder (use create_file)
 EnhanceAsyncRecorderManager (use PlayerRecorder)
   Derivate class from EnhanceAsyncRecorderManager to manage the recorded data.
+
+These classes guarantee that the data is recorded but the recording time can be slower than the real-time event
+NEG: - Loss of event in real world
+     - Buffering can grow drastically
+     - Data is copied
+PRO: - Guarantee all data is recorded

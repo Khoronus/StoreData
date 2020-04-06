@@ -354,6 +354,10 @@ int record_rgbxyz_multithread() {
 */
 int main(int argc, char *argv[], char *window_name)
 {
+	std::cout << "Extract the code to read from zip file from the ";
+	std::cout << "RawRecorder class or pass a functor for data processing"
+		<< std::endl;
+
 	{
 		record_rgbxyz();
 		storedata::RawRecorder pr;
