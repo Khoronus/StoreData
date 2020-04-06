@@ -60,8 +60,16 @@ public:
 	*/
 	STOREDATA_RECORD_EXPORT void setup(const std::string &filename,
 		int max_memory_allocable, int fps);
-	STOREDATA_RECORD_EXPORT void record(cv::Mat &curr, bool encoded, std::string &msg);
-	STOREDATA_RECORD_EXPORT void record(cv::Mat &curr, bool encoded, unsigned char *msg, size_t msg_size);
+	/** @brief
+
+		@previous record
+	*/
+	STOREDATA_RECORD_EXPORT void record_file(cv::Mat &curr, bool encoded, std::string &msg);
+	/** @brief
+
+		@previous record
+	*/
+	STOREDATA_RECORD_EXPORT void record_file(cv::Mat &curr, bool encoded, unsigned char *msg, size_t msg_size);
 
 	/** @brief Setup the recorder properties
 		
@@ -89,7 +97,11 @@ public:
 	*/
 	STOREDATA_RECORD_EXPORT void record_video(std::map<int, cv::Mat> &sources);
 
-	STOREDATA_RECORD_EXPORT void play(const std::string &filename, int FPS);
+	/** @brief
+
+		@previous play
+	*/
+	STOREDATA_RECORD_EXPORT void read_file(const std::string &filename, int FPS);
 
 	/** @brief Unpack previously recorded data
 

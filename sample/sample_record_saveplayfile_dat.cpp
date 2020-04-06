@@ -37,6 +37,16 @@
 namespace
 {
 
+/** @brief Change the name of the file.
+
+	Function from the callback
+*/
+std::string global_fname;
+void name_changed(const std::string &fname) {
+	std::cout << "name_changed: " << fname << std::endl;
+	global_fname = fname;
+}
+
 
 /** @brief It records a video
 */
@@ -48,7 +58,10 @@ int record() {
 	}
 
 	storedata::PlayerRecorder pr;
-	pr.setup("data\\record_", 100000000, 100);
+	pr.set_callback_createfile(std::bind(&name_changed,
+		std::placeholders::_1));
+	//pr.setup("data\\record_", 100000000, 100);
+	pr.setup("data\\record_", 100000, 100);
 
 	while (true) //Show the image captured in the window and repeat
 	{
@@ -57,7 +70,7 @@ int record() {
 		if (curr.empty()) continue;
 
 		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
-		pr.record(curr, 1, msg);
+		pr.record_file(curr, 1, msg);
 
 		////////////////////////////////// Elaboration ////////////////////////////////////////
 		cv::imshow("curr", curr);
@@ -77,6 +90,8 @@ int record_raw() {
 	}
 
 	storedata::RawRecorder pr;
+	pr.set_callback_createfile(std::bind(&name_changed,
+		std::placeholders::_1));
 	pr.setup("data\\record_", 10000, 100);
 
 	while (true) //Show the image captured in the window and repeat
@@ -127,9 +142,9 @@ int main(int argc, char *argv[], char *window_name)
 		record();
 		// Record a video and save some simple data
 		storedata::PlayerRecorder pr;
-		pr.play("data\\record_2019_10_04_01_00_28.dat", 60);
+		pr.read_file("data\\record_2020_04_05_10_43_37.dat", 60);
 		unsigned int index_start = 0;
-		pr.unpack("data\\record_2019_10_04_01_00_28.dat", 60, "unpack\\", index_start);
+		pr.unpack("data\\record_2020_04_05_10_43_37.dat", 60, "unpack\\", index_start);
 	}
 
 	// record a video with a raw data saver
@@ -138,7 +153,7 @@ int main(int argc, char *argv[], char *window_name)
 		record_raw();
 		// Record a video and save some simple data
 		storedata::RawRecorder pr;
-		pr.play("data\\record_2018-12-07.08_20_38.dat", 60);
+		pr.play("data\\record_2020_04_05_10_43_37.dat", 60);
 	}
 
 	return 0;

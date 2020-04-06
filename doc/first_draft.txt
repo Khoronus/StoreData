@@ -44,3 +44,5 @@ combine create_file and create_video
 AtomicContainerData uses shared_ptr and move
 recordcontainervideo derivate of recordcontainer
   
+
+recordcontainer and create_x(file/video) seems similar

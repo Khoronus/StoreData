@@ -177,8 +177,14 @@ void main()
 	double start = cv::getTickCount();
 	bool continue_capture = true;
 	bool bufferize = false;
+	int num_frame_buffer = 0;
+	long long duration_total = 0;
+	long long duration_sum_elems = 0;
 	int num_frame = 0;
 	while (continue_capture) {
+
+		auto t1 = std::chrono::high_resolution_clock::now();
+
 		cv::Mat m;
 		vc >> m;
 		if (m.empty()) continue;
@@ -187,14 +193,13 @@ void main()
 		if (bufferize) {
 
 			// [+] 20170812 Changed the record format
-			std::string fname = "data\\F0_" + std::to_string(num_frame);
+			std::string fname = "data\\F0_" + std::to_string(num_frame_buffer);
 			// Add the record to save on a separate thread
 			RecordContainerData rcd0;
 			rcd0.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
 			record_container[0].push(fname, rcd0);
-			++num_frame;
+			++num_frame_buffer;
 		}
-		std::cout << "Size: " << record_container[0].size_about() << " " << record_container[0].size_about_micro() << std::endl;
 
 		cv::imshow("m", m);
 		char c = cv::waitKey(1);
@@ -210,6 +215,18 @@ void main()
 		case 'p':
 			bufferize = false;
 			break;
+		}
+		++num_frame;
+
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+		duration_total += duration;
+		duration_sum_elems += 1;
+		if (num_frame % 30 == 0) {
+			std::cout << "Size: " << record_container[0].size_about() << " " << record_container[0].size_about_micro() << std::endl;
+			std::cout << "ct: " << duration_total / duration_sum_elems << std::endl;
+			duration_total = duration;
+			duration_sum_elems = 1;
 		}
 	}
 

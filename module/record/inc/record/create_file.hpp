@@ -23,11 +23,15 @@
 #ifndef STOREDATA_RECORD_CREATE_FILE_HPP__
 #define STOREDATA_RECORD_CREATE_FILE_HPP__
 
+#include <future>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
+#include <thread>
+#include <mutex>
+#include <queue>
 
 #define BOOST_BUILD
 #ifdef BOOST_BUILD
@@ -51,7 +55,7 @@ const int kOutOfMemory = -1;
 const int kDataIsEmpty = -2;
 const int kFileIsNotOpen = -3;
 
-/** @brief Class to capture video with a maximum size.
+/** @brief Class to memorize a file until memory is availeble.
 */
 class MemorizeFileManager
 {
@@ -66,11 +70,21 @@ class MemorizeFileManager
 	  STOREDATA_RECORD_EXPORT void release();
 
 	  /** @brief Setup the data
+
+		  @param[in] memory_max_allocable Max memory that can be recorded in 
+		                                  the file.
+		  @param[in] filename Name of the file (root). An appendix will be add.
+		  @param[in] extension Extension add to the end of the file (i.e. ".dat")
+
 	  */
-	  STOREDATA_RECORD_EXPORT void setup(size_t memory_max_allocable,
-		  const std::string &filename);
+	  STOREDATA_RECORD_EXPORT void setup(
+		  size_t memory_max_allocable,
+		  const std::string &filename,
+		  const std::string &dot_extension);
 
 	  /** @brief Generate a target binary file.
+
+		@param[in] appendix C
 	  */
 	  STOREDATA_RECORD_EXPORT int generate(const std::string &appendix, bool append);
 
@@ -87,6 +101,9 @@ class MemorizeFileManager
 	  /** @brief Path and name of the file to memorize
 	  */
 	  std::string filename_;
+	  /** @brief Extension to the file
+	  */
+	  std::string dot_extension_;
 	  /** @brief Memory allocated
 	  */
 	  size_t memory_expected_allocated_;
@@ -123,13 +140,29 @@ public:
 	const std::string& filename() const {
 		return filename_;
 	}
+	void set_dot_extension(const std::string &dot_extension) {
+		dot_extension_ = dot_extension;
+	}
+	const std::string& dot_extension() const {
+		return dot_extension_;
+	}
 private:
 
 	std::string filename_;
+	std::string dot_extension_;
 };
 
 
-/** @brief Class to manage the 
+/** @brief Class to manage the writing of the data in a file asynchronously.
+	
+	This class has a potential issue to lose or overwrite the data
+	before it is saved.
+
+	This class allows the loss of frames or data during the writing.
+	However, it is guarantee that during the writing, the data is not
+	modified.
+
+	@brief ThreadSafe
 */
 class FileGeneratorManagerAsync
 {
@@ -140,30 +173,38 @@ public:
 	STOREDATA_RECORD_EXPORT ~FileGeneratorManagerAsync();
 
 	/** @brief Setup the data to memorize
+
+		Setup the data to memorize.
+		@param[in] max_memory_allocable Maximum amount of memory allowed for a 
+		                                file.
+		@param[in] fgp Container with file generator parameters. The total 
+		               number of files that can be created at one time is equal
+					   to the number of instances used (same ID).
 	*/
 	STOREDATA_RECORD_EXPORT int setup(
 		unsigned int max_memory_allocable,
-		std::map<int, FileGeneratorParams> &vgp, int framerate);
+		std::map<int, FileGeneratorParams> &fgp, int record_framerate);
 
 	/** @brief Check if the video stream is in writing mode
 	*/
 	STOREDATA_RECORD_EXPORT bool under_writing();
 
-	/** @brief Function to add the frames to videos. It is run in a separate
+	/** @brief Function to add the frames to file. It is run in a separate
 	           thread.
 	*/
-	STOREDATA_RECORD_EXPORT void procedure();
+	STOREDATA_RECORD_EXPORT bool procedure();
 
 	STOREDATA_RECORD_EXPORT void check();
 
-	/** @brief Try to push the frame data in a file.
+	/** @brief Try to push the data to a designed file writer.
 
-		Try to push the frame data in a file.
-		@param[in] data_in The data to save in a file. The data_in key is used to save the file.
+		Try to push the data to a designed file writer.
+		@param[in] data_in The data to save in a file. The data_in key is used 
+		                   to select which file writer will be used.
 	*/
-	STOREDATA_RECORD_EXPORT int push_data(const std::map<int, std::vector<char> > &data_in);
+	STOREDATA_RECORD_EXPORT int push_data_can_replace(const std::map<int, std::vector<char> > &data_in);
 
-	/** @brief Close the video
+	/** @brief Close the file
 	*/
 	STOREDATA_RECORD_EXPORT void close();
 
@@ -190,7 +231,7 @@ public:
 	bool under_writing_;
 
 	// set framerate to record and capture at
-	int framerate_;
+	int record_framerate_;
 
 	// Get the properties from the camera
 	//double width_;

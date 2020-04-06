@@ -53,11 +53,10 @@ CREATE_EXAMPLE(sample_record_saveplayfile "sample_record_saveplayfile" "record;c
 CREATE_EXAMPLE(sample_record_saveplayfile_dat "sample_record_saveplayfile_dat" "record;codify")
 CREATE_EXAMPLE(sample_rawrecorder "sample_rawrecorder" "record;codify")
 CREATE_EXAMPLE(sample_rawrecorder_serialized "sample_rawrecorder_serialized" "record;codify")
-CREATE_EXAMPLE(sample_record_saveplayfile_avi "sample_record_saveplayfile_avi" "record;codify")
-CREATE_EXAMPLE(sample_record_saveplayfile_avi_v2 "sample_record_saveplayfile_avi_v2" "record;codify;video;StoreData")
+CREATE_EXAMPLE(sample_EnhanceAsyncRecorderManager "sample_EnhanceAsyncRecorderManager" "record;codify;video;StoreData")
 CREATE_EXAMPLE(sample_record_container "sample_record_container" "record")
 CREATE_EXAMPLE(sample_record_container_video "sample_record_container_video" "record")
-CREATE_EXAMPLE(sample_record_container_generic "sample_record_container_generic" "buffer;record")
+CREATE_EXAMPLE(sample_DataDesynchronizerGeneric "sample_DataDesynchronizerGeneric" "buffer;record")
 CREATE_EXAMPLE(sample_volatile_timed_buffer "sample_volatile_timed_buffer" "buffer;record")
 CREATE_EXAMPLE(sample_create_file "sample_create_file" "record")
 

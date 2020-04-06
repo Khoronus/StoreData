@@ -59,7 +59,7 @@ int record() {
 		if (curr.empty()) continue;
 
 		std::string msg = "obj1 4.04 5.05 6.06 7.07|obj2 1.01 2.02 3.03";
-		pr.record(curr, 1, msg);
+		pr.record_file(curr, 1, msg);
 
 		////////////////////////////////// Elaboration ////////////////////////////////////////
 		cv::imshow("curr", curr);
@@ -354,6 +354,17 @@ int record_rgbxyz() {
 }
 
 
+/** @brief Change the name of the file.
+
+	Function from the callback
+*/
+std::string global_fname;
+void name_changed(const std::string &fname) {
+	std::cout << "name_changed: " << fname << std::endl;
+	global_fname = fname;
+}
+
+
 /** @brief Multithread version to record the data
 */
 int record_rgbxyz_multithread() {
@@ -380,6 +391,8 @@ int record_rgbxyz_multithread() {
 #endif // DEF_LIB_ZLIB
 
 	storedata::RawRecorder pr;
+	pr.set_callback_createfile(std::bind(&name_changed,
+		std::placeholders::_1));
 	pr.setup("data\\record_", 100000000, 100);
 
 	//Byte* compress = nullptr;
@@ -554,9 +567,9 @@ int main(int argc, char *argv[], char *window_name)
 
 	if (true) {
 		//record_rgbxyz();
-		record_rgbxyz_multithread();
-		//RawRecorder pr;
-		//pr.play_raw("D:\\workspace\\university\\chuo\\projects\\HumanDetectionRGBD\\src\\ZEDCapture\\build\\data\\record_2018-11-28.03_22_52.dat", 60);
+		//record_rgbxyz_multithread();
+		storedata::RawRecorder pr;
+		pr.play_raw("data\\record_2020_04_05_10_36_35.dat", 60);
 
 	}
 

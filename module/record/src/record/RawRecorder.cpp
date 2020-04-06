@@ -53,7 +53,7 @@ void RawRecorder::record(uint8_t* data, size_t len) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::record(void* data, size_t len) {
@@ -75,7 +75,7 @@ void RawRecorder::record(const void* data, size_t len) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::record(const std::vector<uint8_t> &data) {
@@ -93,7 +93,7 @@ void RawRecorder::record(const std::vector<uint8_t> &data) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::record(const std::string &msg) {
@@ -111,7 +111,7 @@ void RawRecorder::record(const std::string &msg) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
 template <typename _Ty>
@@ -130,7 +130,7 @@ void RawRecorder::record_t(_Ty data, size_t len) {
 	memcpy(&m_data[0][0], &size_msg_data, sizeof(size_t));
 	memcpy(&m_data[0][sizeof(size_t)], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
 void RawRecorder::play(const std::string &filename, int FPS) {

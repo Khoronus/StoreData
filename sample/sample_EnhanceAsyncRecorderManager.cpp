@@ -92,7 +92,7 @@ void sample_read_dat(const std::string &fname) {
 	storedata::PlayerRecorder pr;
 	unsigned int index_start = 0;
 	// play
-	pr.play(fname, 60);
+	pr.read_file(fname, 60);
 }
 
 

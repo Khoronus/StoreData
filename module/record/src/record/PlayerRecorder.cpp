@@ -62,7 +62,7 @@ void PlayerRecorder::setup_metaframe(cv::Mat &meta_frame) {
 	vgm_.setup_metaframe(meta_frame);
 }
 // ----------------------------------------------------------------------------
-void PlayerRecorder::record(cv::Mat &curr, bool encoded, std::string &msg) {
+void PlayerRecorder::record_file(cv::Mat &curr, bool encoded, std::string &msg) {
 
 	if (fgm_.under_writing()) return;
 
@@ -115,10 +115,10 @@ void PlayerRecorder::record(cv::Mat &curr, bool encoded, std::string &msg) {
 	memcpy(&m_data[0][24], data, size_img_data);
 	memcpy(&m_data[0][24 + size_img_data], &info_to_transmit[0], 
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
-void PlayerRecorder::record(
+void PlayerRecorder::record_file(
 	cv::Mat &curr, 
 	bool encoded, 
 	unsigned char *msg, 
@@ -176,14 +176,14 @@ void PlayerRecorder::record(
 	memcpy(&m_data[0][24], data, size_img_data);
 	memcpy(&m_data[0][24 + size_img_data], &info_to_transmit[0],
 		size_msg_data);
-	if (!fgm_.push_data(m_data)) { std::cout << "lost" << std::endl; }
+	if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost" << std::endl; }
 }
 // ----------------------------------------------------------------------------
 void PlayerRecorder::record_video(std::map<int, cv::Mat> &sources) {
 	vgm_.push_data(sources);
 }
 // ----------------------------------------------------------------------------
-void PlayerRecorder::play(const std::string &filename, int FPS) {
+void PlayerRecorder::read_file(const std::string &filename, int FPS) {
 	int _FPS = (std::max)(1, FPS);
 	// Read the data
 	bool bPlayRecord = true;

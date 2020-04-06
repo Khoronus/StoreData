@@ -195,7 +195,7 @@ EnhanceAsyncRecorderManager::EARM EnhanceAsyncRecorderManager::record(
 				player_recorder_.record_video(sources);
 			} else {
 				// use record dat file
-				player_recorder_.record(tmp, true, shared_buffer_.get(),
+				player_recorder_.record_file(tmp, true, shared_buffer_.get(),
 					raw_data_size_ + timestamp_size);
 			}
 			done_ = true;
@@ -330,7 +330,7 @@ EnhanceAsyncRecorderManager::EARM EnhanceAsyncRecorderManager::record(
 			}
 			else {
 				// use record dat file
-				player_recorder_.record(tmp, true, shared_buffer_.get(),
+				player_recorder_.record_file(tmp, true, shared_buffer_.get(),
 					raw_data_size_ + timestamp_size);
 			}
 			done_ = true;

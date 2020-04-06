@@ -36,7 +36,7 @@
 */
 void test_MemorizeFileManager() {
 	storedata::MemorizeFileManager mfm;
-	mfm.setup(200, "data\\MemorizeFileManager_");
+	mfm.setup(200, "data\\MemorizeFileManager_", ".dat");
 
 	int num_file = 0;
 	for (int i = 0; i < 100; ++i) {
@@ -76,28 +76,31 @@ void test_FileGeneratorManagerAsync() {
 
 	std::cout << "insert FileGeneratorParam" << std::endl;
 	fgp_.insert(std::make_pair(0, storedata::FileGeneratorParams()));
-	std::string filename = "data\\FileGeneratoeManagerAsync_";
+	std::string filename = "data\\FileGeneratorManagerAsync_";
+	std::string dot_ext = ".dat";
 	std::cout << "filename: " << filename << std::endl;
 	fgp_[0].set_filename(filename);
-	unsigned int max_memory_allocable = 1000;
-	int fps = 30;
+	fgp_[0].set_dot_extension(dot_ext);
+	unsigned int max_memory_allocable = 100000;
+	int fps = 1000;
 	fgm_.setup(max_memory_allocable, fgp_, fps);
 	fgm_.set_callback_createfile(std::bind(&name_changed, std::placeholders::_1));
 
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 1000; ++i) {
 		std::string s = "This is the sample line " + std::to_string(i) + '\n';
 		std::vector<char> v;
 		std::copy(s.begin(), s.end(), std::back_inserter(v));
 
-		// Prepare the container for the data to transmit
-		std::map<int, std::vector<char> > m_data;
-		m_data[0] = v;
-		if (!fgm_.push_data(m_data)) { std::cout << "lost:" << i << std::endl; }
+		if (!fgm_.under_writing()) {
+			// Prepare the container for the data to transmit
+			std::map<int, std::vector<char> > m_data;
+			m_data[0] = v;
+			if (!fgm_.push_data_can_replace(m_data)) { std::cout << "lost:" << i << std::endl; }
+		} else {
+			std::cout << "[-] writing: " << i << std::endl;
+		}
 	}
-	while (fgm_.under_writing()) {
-		//std::cout << "under writing" << std::endl;
-		fgm_.check();
-	}
+	fgm_.close();
 }
 
 //-----------------------------------------------------------------------------

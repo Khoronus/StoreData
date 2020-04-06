@@ -38,16 +38,18 @@ void MemorizeFileManager::release() {
 }
 // ----------------------------------------------------------------------------
 void MemorizeFileManager::setup(size_t memory_max_allocable,
-	const std::string &filename) {
+	const std::string &filename,
+	const std::string &dot_extension) {
 
 	memory_expected_allocated_ = 0;
 	memory_max_allocable_ = memory_max_allocable;
 	filename_ = filename;
+	dot_extension_ = dot_extension;
 }
 // ----------------------------------------------------------------------------
 int MemorizeFileManager::generate(const std::string &appendix, bool append) {
 	if (!fout_.is_open()) {
-		std::string filename = filename_ + appendix + ".dat";
+		std::string filename = filename_ + appendix + dot_extension_;
 		std::cout << filename << std::endl;
 		// get the current time
 		if (append) {
@@ -99,12 +101,12 @@ FileGeneratorManagerAsync::~FileGeneratorManagerAsync() {
 // ----------------------------------------------------------------------------
 int FileGeneratorManagerAsync::setup(
 	unsigned int max_memory_allocable,
-	std::map<int, FileGeneratorParams> &vgp, int framerate) {
+	std::map<int, FileGeneratorParams> &vgp, int record_framerate) {
 	std::cout << "FileGeneratorManagerAsync::setup" << std::endl;
-	int return_status = 1;
+	int return_status = kSuccess;
 
 	// set framerate to record and capture at
-	framerate_ = framerate;
+	record_framerate_ = record_framerate;
 
 #ifdef BOOST_BUILD
 
@@ -137,9 +139,9 @@ int FileGeneratorManagerAsync::setup(
 	{
 		m_files_[it->first] = new MemorizeFileManager();
 		m_files_[it->first]->setup(max_memory_allocable,
-			it->second.filename());
+			it->second.filename(), it->second.dot_extension());
 		if (!m_files_[it->first]->generate(appendix, false)) {
-			return_status = 0;
+			return_status = kFail;
 		}
 	}
 
@@ -152,12 +154,14 @@ bool FileGeneratorManagerAsync::under_writing() {
 	return under_writing_;
 }
 // ----------------------------------------------------------------------------
-void FileGeneratorManagerAsync::procedure() {
+bool FileGeneratorManagerAsync::procedure() {
 
 #ifdef BOOST_BUILD
 
-    boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
-    if (lock) {
+	bool result_out = false;
+
+	boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
+	if (lock) {
 		under_writing_ = true;
 
 		//determine current elapsed time
@@ -165,7 +169,7 @@ void FileGeneratorManagerAsync::procedure() {
 		td_ = (currentFrameTimestamp_ - nextFrameTimestamp_);
 
 		// wait for X microseconds until 1second/framerate time has passed after previous frame write
-		if (td_.total_microseconds() >= 1000000 / framerate_){
+		if (td_.total_microseconds() >= 1000000 / record_framerate_) {
 
 			//	 determine time at start of write
 			initialLoopTimestamp_ = boost::posix_time::microsec_clock::local_time();
@@ -222,7 +226,11 @@ void FileGeneratorManagerAsync::procedure() {
 			{
 				// Test if the file manager exists
 				if (m_files_.find(it->first) != m_files_.end()) {
-					m_files_[it->first]->push(it->second);
+					// If able to write to disk
+					if (m_files_[it->first]->push(it->second) ==
+						kSuccess) {
+						result_out = true;
+					}
 				}
 			}
 
@@ -232,8 +240,8 @@ void FileGeneratorManagerAsync::procedure() {
 			}
 
 			// add 1second/framerate time for next loop pause
-			nextFrameTimestamp_ = nextFrameTimestamp_ + 
-				boost::posix_time::microsec(1000000 / framerate_);
+			nextFrameTimestamp_ = nextFrameTimestamp_ +
+				boost::posix_time::microsec(1000000 / record_framerate_);
 
 			// reset time_duration so while loop engages
 			td_ = (currentFrameTimestamp_ - nextFrameTimestamp_);
@@ -250,38 +258,52 @@ void FileGeneratorManagerAsync::procedure() {
 			}
 		}
 		under_writing_ = false;
-	} 
-	//--number_addframe_requests_;
+	}
+	return result_out;
 
 #endif
 }
 // ----------------------------------------------------------------------------
 void FileGeneratorManagerAsync::check() {
-	std::cout << "push " << under_writing_ << std::endl;//" " << number_addframe_requests_ << std::endl;
+	std::cout << "FileGeneratorManagerAsync::check(): " << under_writing_ << 
+		std::endl;//" " << number_addframe_requests_ << std::endl;
 }
 // ----------------------------------------------------------------------------
-int FileGeneratorManagerAsync::push_data(const std::map<int, std::vector<char> > &data_in) {
+int FileGeneratorManagerAsync::push_data_can_replace(
+	const std::map<int, std::vector<char> > &data_in) {
+
+	bool write_success = false;
 
 #ifdef BOOST_BUILD
 	if (!under_writing_) {
-		boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
-		if (lock) {
-			//++number_addframe_requests_;
+		{
+			boost::mutex::scoped_lock lock(mutex_, boost::try_to_lock);
+			if (lock) {
+				//++number_addframe_requests_;
 #if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
-			for (auto it = data_in.begin(); it != data_in.end(); it++)
+				for (auto it = data_in.begin(); it != data_in.end(); it++)
 #else
-			for (std::map<int, std::vector<char> >::const_iterator it = data_in.begin(); it != data_in.end(); it++)
+				for (std::map<int, std::vector<char> >::const_iterator it = data_in.begin(); it != data_in.end(); it++)
 #endif		
-			{
-				data_in_[it->first] = it->second;
+				{
+					data_in_[it->first] = it->second;
+				}
+				write_success = true;
 			}
-			boost::thread* thr = new boost::thread(
-				boost::bind(&FileGeneratorManagerAsync::procedure, this));
-			return kSuccess;
 		}
+		//boost::thread* thr = new boost::thread(
+		//	boost::bind(&FileGeneratorManagerAsync::procedure, this));
+		if (write_success) {
+			std::async(&FileGeneratorManagerAsync::procedure, this);
+		}
+
+		// used only for test to detect lost frames
+		//container_future_.push(std::async(&FileGeneratorManagerAsync::procedure, this));
+		//return kSuccess;
 	}
 #endif
-	return kFail;
+	//return kFail;
+	return write_success;
 }
 // ----------------------------------------------------------------------------
 void FileGeneratorManagerAsync::close() {
@@ -301,6 +323,14 @@ void FileGeneratorManagerAsync::close() {
 		delete it->second;
 	}
 	m_files_.clear();
+
+	// used only for test to detect lost frames
+	//// Container with the future result
+	//while (!container_future_.empty())
+	//{
+	//	std::cout << "res:" << container_future_.front().get() << std::endl;
+	//	container_future_.pop();
+	//}
 }
 // ----------------------------------------------------------------------------
 void FileGeneratorManagerAsync::set_verbose(bool verbose) {
