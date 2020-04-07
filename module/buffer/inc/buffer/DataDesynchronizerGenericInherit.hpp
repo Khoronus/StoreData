@@ -1,5 +1,5 @@
 /**
-* @file DataDesynchronizerGeneric.hpp
+* @file DataDesynchronizerGenericInherit.hpp
 * @brief Header of the defined class
 *
 * @section LICENSE
@@ -22,8 +22,8 @@
 */
 
 
-#ifndef STOREDATA_BUFFER_RECORDCONTAINERGENERIC_HPP__
-#define STOREDATA_BUFFER_RECORDCONTAINERGENERIC_HPP__
+#ifndef STOREDATA_BUFFER_RECORDCONTAINERGENERICINHERIT_HPP__
+#define STOREDATA_BUFFER_RECORDCONTAINERGENERICINHERIT_HPP__
 
 #include <vector>
 #include <iostream>
@@ -35,7 +35,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "logger/inc/logger/log.hpp"
-#include "AtomicContainerData.hpp"
+#include "AtomicContainerDataInherit.hpp"
 
 namespace storedata
 {
@@ -44,21 +44,21 @@ namespace storedata
 
 	Callback function to process the data.
 */
-typedef std::function<void(const std::string &msg, AtomicContainerData &rcd)> cbk_func;
+typedef std::function<void(std::unique_ptr<AtomicContainerDataInherit> &rcd)> cbk_func_inherit;
 
 
 /** @brief Class to record all the frames currently captured
 */
-class DataDesynchronizerGeneric
+class DataDesynchronizerGenericInherit
 {
 
 public:
 
-	STOREDATA_BUFFER_EXPORT DataDesynchronizerGeneric();
+	STOREDATA_BUFFER_EXPORT DataDesynchronizerGenericInherit();
 
 	/** @brief It push a new frame to save
 	*/
-	STOREDATA_BUFFER_EXPORT void push(const std::string &msg, AtomicContainerData &rcd);
+	STOREDATA_BUFFER_EXPORT void push(std::unique_ptr<AtomicContainerDataInherit> &rcd);
 
 	/** @brief It starts the thread
 	*/
@@ -107,8 +107,8 @@ public:
 
 	/** @brief It sets the callback for the function that record data
 	*/
-	STOREDATA_BUFFER_EXPORT void set_cbk_func(
-		cbk_func callback_func);
+	STOREDATA_BUFFER_EXPORT void set_cbk_func_inherit(
+		cbk_func_inherit callback_func);
 
 private:
 
@@ -143,14 +143,14 @@ private:
 
 	/** @brief Container with the data to save and a message associated
 	*/
-	std::queue<std::pair<std::string, AtomicContainerData>> container_;
+	std::queue<std::unique_ptr<AtomicContainerDataInherit>> container_;
 
 	/** @brief Callback recorder function
 	*/
-	cbk_func callback_func_;
+	cbk_func_inherit callback_func_;
 };
 
 
 } // namespace storedata
 
-#endif // STOREDATA_BUFFER_RECORDCONTAINERGENERIC_HPP__
+#endif // STOREDATA_BUFFER_RECORDCONTAINERGENERICINHERIT_HPP__

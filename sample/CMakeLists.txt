@@ -56,6 +56,7 @@ CREATE_EXAMPLE(sample_record_container_file "sample_record_container_file" "reco
 CREATE_EXAMPLE(sample_record_container_video "sample_record_container_video" "buffer;record")
 CREATE_EXAMPLE(sample_DataDesynchronizerGeneric "sample_DataDesynchronizerGeneric" "buffer;record")
 CREATE_EXAMPLE(sample_DataDesynchronizerGenericFaster "sample_DataDesynchronizerGenericFaster" "buffer;record")
+CREATE_EXAMPLE(sample_DataDesynchronizerGenericInherit "sample_DataDesynchronizerGenericInherit" "buffer;record")
 CREATE_EXAMPLE(sample_volatile_timed_buffer "sample_volatile_timed_buffer" "buffer;record")
 CREATE_EXAMPLE(sample_create_file "sample_create_file" "record")
 CREATE_EXAMPLE(sample_create_video "sample_create_video" "record")

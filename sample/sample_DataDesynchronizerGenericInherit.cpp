@@ -18,6 +18,13 @@ public:
 
 	VideoDataRecorder() {}
 
+	void close() {
+		vw_.release();
+		fout_.close();
+		fout_.clear();
+		do_set_fname_root_ = true;
+	}
+
 	/** @brief Set the size of the image
 	*/
 	void set_size_image(const cv::Size &size_image) {
@@ -36,7 +43,7 @@ public:
 
 	Function to record the data.
 	*/
-	void frecorder(std::unique_ptr<storedata::AtomicContainerDataFaster> &rcd) {
+	void frecorder(std::unique_ptr<storedata::AtomicContainerDataInherit> &rcd) {
 
 		// it solves the requests
 		if (do_set_fname_root_) {
@@ -61,10 +68,13 @@ public:
 
 
 		// Process the data
-		if (rcd->data) {
+		if (rcd->getObject(0)) {
 			// convert the binary in image
-			cv::Mat img = cv::Mat(size_image_, CV_8UC3, rcd->data);
-			filevideo_push_frame(vw_, fname_root_ + ".avi", img);
+			//cv::Mat img = cv::Mat(size_image_, CV_8UC3, rcd->data);
+			std::unique_ptr<cv::Mat> *p = static_cast<std::unique_ptr<cv::Mat>*>(rcd->getObject(0));
+
+			filevideo_push_frame(vw_, fname_root_ + ".avi", 
+				*p->get());
 
 			// open a file with the frame information
 			if (!fout_.is_open()) {
@@ -74,7 +84,7 @@ public:
 			std::string timestamp =
 				storedata::DateTime::get_date_as_string() +
 				" " + std::to_string(cv::getTickCount());
-			fout_ << rcd->unique_msg_ << "|" << timestamp << std::endl;
+			fout_ << *static_cast<std::string*>(rcd->getObject(1)) << "|" << timestamp << std::endl;
 		}
 	}
 
@@ -179,41 +189,6 @@ public:
 	}
 };
 
-
-/** @brief Container data to transfer data between threads. It copies the data.
-*/
-template <typename _Ty>
-struct AtomicContainerDataTest
-{
-	std::unique_ptr<_Ty> data;
-
-	AtomicContainerDataTest() : data(nullptr) {}
-	void moveFrom(std::unique_ptr<_Ty> &obj) {
-		data = std::move(obj);
-	}
-	void moveTo(std::unique_ptr<_Ty> &obj) {
-		obj = std::move(data);
-	}
-
-	void copyFrom(const void* src, size_t src_size_bytes) {
-		if (data) dispose();
-		size_bytes = src_size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, src, size_bytes);
-	}
-	void copyFrom(AtomicContainerDataTest &obj) {
-		if (data) dispose();
-		size_bytes = obj.size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, obj.data, obj.size_bytes);
-	}
-	void dispose() {
-		if (data) { free(data); data = nullptr; }
-	}
-
-};
-
-
 void func(BaseClass &bc) {
 	std::cout << typeid(bc).name() << std::endl;
 	if (strcmp(typeid(bc).name(),"class DerivedA") == 0) {
@@ -229,6 +204,118 @@ void func(BaseClass &bc) {
 		std::cout << "k:" << s->get()->size() << std::endl;
 	}
 }
+
+
+//template <typename _Ty>
+//class AtomicContainerDataInheritD : public storedata::AtomicContainerDataInherit
+//{
+//public:
+//
+//	AtomicContainerDataInheritD() {}
+//	~AtomicContainerDataInheritD() {
+//		std::cout << "disposeD" << std::endl;
+//	}
+//
+//	void* getObject(int which) {
+//		if (which == 0) return &k;
+//		if (which == 1) return &msg_;
+//		return nullptr;
+//	}
+//
+//	void dispose() {
+//		std::cout << "disposeD" << std::endl;
+//		k.
+//	}
+//
+//
+//	void moveFrom(std::unique_ptr<_Ty> &obj) {
+//		k = std::move(obj);
+//	}
+//	void moveTo(std::unique_ptr<_Ty> &obj) {
+//		obj = std::move(k);
+//	}
+//
+//	void set_msg(const std::string &msg) {
+//		msg_ = msg;
+//	}
+//
+//private:
+//
+//	std::unique_ptr<_Ty> k;
+//	std::string msg_;
+//};
+
+
+class AtomicContainerDataInheritD : public storedata::AtomicContainerDataInherit
+{
+public:
+
+	AtomicContainerDataInheritD() {}
+	~AtomicContainerDataInheritD() {
+		//std::cout << "~AtomicContainerDataInheritD" << std::endl;
+	}
+
+	void* getObject(int which) {
+		if (which == 0) return &k;
+		if (which == 1) return &msg_;
+		return nullptr;
+	}
+
+	/** @brief The data must be properly disposed otherwise a memory leak occurs
+	*/
+	void dispose() {
+		//k->release();
+		//k.reset();
+	}
+
+
+	void moveFrom(std::unique_ptr<cv::Mat> &obj) {
+		k = std::move(obj);
+	}
+	void moveTo(std::unique_ptr<cv::Mat> &obj) {
+		obj = std::move(k);
+	}
+
+	void set_msg(const std::string &msg) {
+		msg_ = msg;
+	}
+
+private:
+
+	std::unique_ptr<cv::Mat> k;
+	std::string msg_;
+};
+
+
+class AtomicContainerDataInheritE : public storedata::AtomicContainerDataInherit
+{
+public:
+
+	AtomicContainerDataInheritE() {}
+
+	void* getObject(int which) {
+		if (which == 0) return &k;
+		if (which == 1) return &msg_;
+		return nullptr;
+	}
+
+	void moveFrom(std::unique_ptr<cv::Mat> &obj) {
+		k = std::move(obj);
+	}
+	void moveTo(std::unique_ptr<cv::Mat> &obj) {
+		obj = std::move(k);
+	}
+
+	void set_msg(const std::string &msg) {
+		msg_ = msg;
+	}
+
+private:
+
+	std::unique_ptr<cv::Mat> k;
+	std::string msg_;
+};
+
 
 void test_atomic_container() {
 
@@ -277,11 +364,12 @@ void test_atomic_container() {
 		vc >> *ptr.get();
 		if (ptr.get()->empty()) continue;
 
-		AtomicContainerDataTest<cv::Mat> acdt;
+		AtomicContainerDataInheritD acdt;
 		acdt.moveFrom(ptr);
 
 		if (ptr) cv::imshow("m", *ptr.get());
-		if (acdt.data) cv::imshow("t", *acdt.data.get());
+		std::unique_ptr<cv::Mat> *p = static_cast<std::unique_ptr<cv::Mat>*>(acdt.getObject(0));
+		if (!p->get()->empty()) cv::imshow("t", *p->get());
 		cv::waitKey();
 	}
 }
@@ -302,14 +390,14 @@ void main()
 
 	/** @brief Container with the data to record
 	*/
-	std::map<int, storedata::DataDesynchronizerGenericFaster> record_container;
+	std::map<int, storedata::DataDesynchronizerGenericInherit> record_container;
 	/** @brief Video data recorder which accepts data from DataDesynchronizer
 	*/
 	VideoDataRecorder vdr;
-	record_container[0].set_cbk_func_faster(std::bind(&VideoDataRecorder::frecorder, &vdr,
+	record_container[0].set_cbk_func_inherit(std::bind(&VideoDataRecorder::frecorder, &vdr,
 		std::placeholders::_1));
 
-	vdr.set_fname_root("data\\sample_DataDesynchronizerGenericFaster");
+	vdr.set_fname_root("data\\sample_DataDesynchronizerGenericInherit");
 	vdr.set_size_image(cv::Size(640, 480));
 
 	double start = cv::getTickCount();
@@ -317,9 +405,19 @@ void main()
 	bool bufferize = false;
 	int num_frame = 0;
 	while (continue_capture) {
-		cv::Mat m;
-		vc >> m;
-		if (m.empty()) continue;
+
+		auto t1 = std::chrono::high_resolution_clock::now();
+
+		auto ptr = std::make_unique<cv::Mat>();
+		vc >> *ptr.get();
+		if (ptr.get()->empty()) continue;
+
+		if (ptr) {
+			cv::imshow("m", *ptr);
+		} else {
+			cv::Mat m(50, 50, CV_8UC3, cv::Scalar(0, 255));
+			cv::imshow("m", m);
+		}
 
 		// Save the current frame
 		if (bufferize) {
@@ -327,16 +425,24 @@ void main()
 			// [+] 20170812 Changed the record format
 			std::string msg = "data\\F0_" + std::to_string(num_frame);
 			// Add the record to save on a separate thread
-			auto rcd0 = 
-				std::make_unique<storedata::AtomicContainerDataFaster>();
-			rcd0->set_unique_msg(msg);
-			rcd0->copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
-			record_container[0].push(rcd0);
+			// https://stackoverflow.com/questions/17473900/unique-ptr-to-a-derived-class-as-an-argument-to-a-function-that-takes-a-unique-p
+			// https://stackoverflow.com/questions/8114276/how-do-i-pass-a-unique-ptr-argument-to-a-constructor-or-a-function/8114913#8114913
+			auto rcd0 =
+				std::make_unique<AtomicContainerDataInheritD>();
+			rcd0->set_msg(msg);
+			rcd0->moveFrom(ptr);
+			std::unique_ptr<storedata::AtomicContainerDataInherit> rcd1 = std::move(rcd0);
+			record_container[0].push(rcd1);
 			++num_frame;
 		}
-		std::cout << "Size: " << record_container[0].size_about() << std::endl;
+		//std::cout << "Size: " << record_container[0].size_about() << std::endl;
 
-		cv::imshow("m", m);
+		//if (ptr) {
+		//	cv::imshow("m", *ptr);
+		//} else {
+		//	cv::Mat m(50, 50, CV_8UC3, cv::Scalar(0,255));
+		//	cv::imshow("m", m);
+		//}
 		char c = cv::waitKey(1);
 
 		switch (c) {
@@ -353,15 +459,16 @@ void main()
 			break;
 		case 'p':
 			bufferize = false;
+			record_container[0].close();
+			vdr.close();
 			break;
 		}
+
+		auto t2 = std::chrono::high_resolution_clock::now();
+
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 	}
 
 	record_container[0].set_save_boost(true);
-	for (auto &it : record_container) {
-		it.second.stop();
-		if (!it.second.wait_until_is_not_ready(100, 5)) {
-			std::cout << "Failed to stop " << it.first << std::endl;
-		}
-	}
+	record_container[0].close();
 }

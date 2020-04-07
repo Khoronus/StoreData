@@ -34,7 +34,11 @@ size_t VolatileTimedBuffer::size() {
 	return macro_container_.size();
 }
 //-----------------------------------------------------------------------------
-void VolatileTimedBuffer::clean(double timestamp, double timestamp_maxdiff) {
+void VolatileTimedBuffer::clear() {
+	macro_container_.clear();
+}
+//-----------------------------------------------------------------------------
+void VolatileTimedBuffer::clean_buffer(double timestamp, double timestamp_maxdiff) {
 	//std::cout << "Total buffers: " <<
 	//	macro_container_.size() << std::endl;
 	std::vector<PtrMicrobuffer> vremove;

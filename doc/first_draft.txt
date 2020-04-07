@@ -75,6 +75,8 @@ NEG: - Loss of event in real world
 PRO: - Desinchronize synchronize events
 
 DataDesynchronizerGeneric with callback functions (usually in classes, like VideoDataRecorder).
+DataDesynchronizerGenericFaster
+DataDesynchronizerGenericInherit
 
 Real-Time recording with buffering (?)
  - Thread A only capture

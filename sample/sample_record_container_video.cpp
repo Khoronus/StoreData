@@ -101,11 +101,13 @@ void main()
 				std::to_string(mm) + ":" + std::to_string(ss) + ":" +
 				std::to_string(ff);
 			double tnow = (cv::getTickCount() - start) / cv::getTickFrequency();
+
+			small_buffer_.clean_buffer(tnow, 3.0);
+
 			if (!small_buffer_.add_forceexpand(tnow,
 				std::make_shared<MicroBufferObjDerived>(MicroBufferObjDerived(timecode, m.clone())))) {
 				std::cout << "buffer critical error" << std::endl;
 			}
-			small_buffer_.clean(tnow, 3.0);
 		}
 
 
@@ -139,10 +141,15 @@ void main()
 			if (bufferize_microbuffer) {
 				small_buffer_.get_ptr_containers(5, vptr);
 				record_container[0].push(vptr, false, -1);
+				// clear the buffers
+				vptr.clear();
+				small_buffer_.clear();
 			}
+			bufferize_microbuffer = false;
 			record_container[0].start();
 			break;
 		case 'p':
+			bufferize_microbuffer = true;
 			bufferize = false;
 			record_container[0].set_save_boost(true);
 			record_container[0].close(10, 100);

@@ -58,6 +58,12 @@ void DataDesynchronizerGenericFaster::stop() {
 	cond_.notify_one();
 }
 //-----------------------------------------------------------------------------
+void DataDesynchronizerGenericFaster::close() {
+	stop();
+	wait_until_is_not_ready(10, 100);
+	wait_until_buffer_is_empty(10, 100);
+}
+//-----------------------------------------------------------------------------
 void DataDesynchronizerGenericFaster::internal_thread() {
 
 	is_running_ = true;

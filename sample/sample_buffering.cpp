@@ -114,7 +114,7 @@ void test_recordcontainerfile_microbuffer() {
 	record_container[id].push(vptr, false, -1);
 
 	// Clean size of the frame expire
-	small_buffer[id].clean(t_internal, save_frame_expire_time_sec);
+	small_buffer[id].clean_buffer(t_internal, save_frame_expire_time_sec);
 }
 
 /** @brief It record some image data

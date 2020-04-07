@@ -109,7 +109,7 @@ void main()
 				std::cout << "buffer critical error" << std::endl;
 			}
 		}
-		small_buffer_.clean(tnow, 1.5);
+		small_buffer_.clean_buffer(tnow, 1.5);
 		std::cout << "Buffer size: " << small_buffer_.size() << std::endl;
 
 		cv::imshow("m", m);

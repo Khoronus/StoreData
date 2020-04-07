@@ -60,10 +60,14 @@ public:
 	*/
 	STOREDATA_BUFFER_EXPORT size_t size();
 
+	/** @brief Clean the memory
+	*/
+	STOREDATA_BUFFER_EXPORT void clear();
+
 	/** @brief Clean the memory which timestamp is too old compared to the
 	           current timestamp (i.e. 500ms)
 	*/
-	STOREDATA_BUFFER_EXPORT void clean(double timestamp, double timestamp_maxdiff);
+	STOREDATA_BUFFER_EXPORT void clean_buffer(double timestamp, double timestamp_maxdiff);
 
 	/** @brief It creates a new buffer to push new frames
 	*/

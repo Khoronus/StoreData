@@ -68,6 +68,10 @@ public:
 	*/
 	STOREDATA_BUFFER_EXPORT void stop();
 
+	/** @brief It close the recording files
+	*/
+	STOREDATA_BUFFER_EXPORT void close();
+
 	/** @brief Thread used to save the current container of images
 	*/
 	STOREDATA_BUFFER_EXPORT void internal_thread();
