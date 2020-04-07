@@ -6,135 +6,6 @@
 #include "buffer/buffer_headers.hpp"
 #include "record/record_headers.hpp"
 
-typedef unsigned char BYTE;
-
-std::vector<BYTE> readFile(const char* filename)
-{
-	// open the file:
-	std::ifstream file(filename, std::ios::binary);
-	if (!file.is_open()) {
-		std::cout << "[-] : " << filename << std::endl;
-		return std::vector<BYTE>();
-	}
-
-	// Stop eating new lines in binary mode!!!
-	file.unsetf(std::ios::skipws);
-
-	// get its size:
-	std::streampos fileSize;
-
-	file.seekg(0, std::ios::end);
-	fileSize = file.tellg();
-	file.seekg(0, std::ios::beg);
-
-	// reserve capacity
-	std::vector<BYTE> vec;
-	vec.reserve(fileSize);
-
-	// read the data:
-	vec.insert(vec.begin(),
-		std::istream_iterator<BYTE>(file),
-		std::istream_iterator<BYTE>());
-
-	std::cout << "<readFile/>" << std::endl;
-	return vec;
-}
-
-/** @brief It reads some data from a set of files.
-
-The data is in the format XYZRGBA where XYZ is float and RGBA is a 4 byte
-data.
-*/
-void test_binary(
-	const std::string &fname_in) {
-	std::vector<BYTE> vdata = readFile(fname_in.c_str());
-	std::vector<float> data = std::vector<float>(vdata.size() / sizeof(float));
-
-	std::cout << "Copy the points: " << vdata.size() << std::endl;
-	std::cout << "Copy the points: " << data.size() << std::endl;
-	memcpy(data.data(), vdata.data(), sizeof(uchar) * vdata.size());
-
-	for (int i = 0; i < data.size(); ++i) {
-		std::cout << "i > " << data[i] << std::endl;
-	}
-
-	//std::ifstream f(fname_in, std::ios::binary);
-	//for (int i = 0; i < 10000; ++i) {
-	//	float v;
-	//	f.read(reinterpret_cast<char*>(&v), sizeof(float));
-	//	std::cout << "i: " << i << " " << v << std::endl;
-	//}
-}
-
-
-/** @brief It reads some data from a set of files.
-
-The data is in the format XYZRGBA where XYZ is float and RGBA is a 4 byte
-data.
-*/
-void extract_rgb(
-	const std::string &fname_in,
-	cv::Size &size_in,
-	cv::Mat &rgb) {
-	std::vector<BYTE> vdata = readFile(fname_in.c_str());
-	std::cout << "vdata: " << vdata.size() << std::endl;
-	if (vdata.size() == 0) return;
-	rgb = cv::Mat(size_in, CV_8UC3);
-	memcpy(rgb.data, &vdata[0], vdata.size() * sizeof(uchar));
-}
-
-/** @brief It extracts the XYZUV data
-*/
-void extract_xyzuv(
-	const std::string &fname_xyz,
-	const std::string &fname_uv,
-	std::vector<cv::Point3f> &xyz,
-	std::vector<cv::Point2f> &uv) {
-	std::vector<BYTE> xyz_raw_data = readFile(fname_xyz.c_str());
-	std::vector<BYTE> uv_raw_data = readFile(fname_uv.c_str());
-	std::vector<float> xyzdata = std::vector<float>(xyz_raw_data.size() / sizeof(float));
-	std::vector<float> uvdata = std::vector<float>(uv_raw_data.size() / sizeof(float));
-
-	memcpy(xyzdata.data(), xyz_raw_data.data(), sizeof(uchar) * xyz_raw_data.size());
-	memcpy(uvdata.data(), uv_raw_data.data(), sizeof(uchar) * uv_raw_data.size());
-
-	std::cout << "# xyz points: " << xyzdata.size() / 3 << std::endl;
-	std::cout << "# uv points: " << uvdata.size() / 2 << std::endl;
-
-	size_t s = xyzdata.size() / 3;
-	for (size_t i = 0; i < s; ++i) {
-		xyz.push_back(cv::Point3f(xyzdata[i * 3], xyzdata[i * 3 + 1],
-			xyzdata[i * 3 + 2]));
-		uv.push_back(cv::Point2f(uvdata[i * 2], uvdata[i * 2 + 1]));
-	}
-}
-
-
-
-/** @brief Example to read saved data from the CaptureRealSense
-*/
-void read_saved_data() {
-	std::string path = "D:\\workspace\\programs\\projects\\CameraCapture\\CameraCaptureRealSense\\build\\sample\\data\\";
-	for (int i = 0; i < 100; ++i) {
-		// read image
-		cv::Mat rgb;
-		extract_rgb(path + "frame_" + std::to_string(i) + ".data", cv::Size(640, 480), rgb);
-		// read xyz
-		std::vector<cv::Point3f> xyz;
-		std::vector<cv::Point2f> uv;
-		extract_xyzuv(
-			path + "xyz_" + std::to_string(i) + ".data",
-			path + "uv_" + std::to_string(i) + ".data",
-			xyz, uv);
-		std::cout << "XYZ: " << xyz.size() << " " << uv.size() << std::endl;
-		// read uv
-		if (!rgb.empty()) {
-			cv::imshow("rgb", rgb);
-			if (cv::waitKey(0) == 27) break;
-		}
-	}
-}
-
 
 /** @brief Class to record all the frames currently captured
 
@@ -248,6 +119,38 @@ private:
 
 };
 
+class BaseClass
+{
+public:
+
+	BaseClass() {};
+	virtual ~BaseClass() {};
+
+	virtual void getFrom() = 0;
+};
+
+class DerivedA : public BaseClass
+{
+public:
+
+	DerivedA() {}
+
+	void getFrom() {
+		std::cout << "DerivedA" << std::endl;
+	}
+};
+
+class DerivedB : public BaseClass
+{
+public:
+
+	DerivedB() {}
+
+	void getFrom() {
+		std::cout << "DerivedB" << std::endl;
+	}
+};
+
 
 /** @brief Container data to transfer data between threads. It copies the data.
 */
@@ -255,22 +158,68 @@ template <typename _Ty>
 struct AtomicContainerDataTest
 {
 	std::unique_ptr<_Ty> data;
-	size_t size_bytes;
+
 	AtomicContainerDataTest() : data(nullptr) {}
-	void getFrom(std::unique_ptr<_Ty> &src, size_t src_size_bytes) {
-		size_bytes = src_size_bytes;
-		data = std::move(src);
+	void moveFrom(std::unique_ptr<_Ty> &obj) {
+		data = std::move(obj);
 	}
-	//void copyFrom(AtomicContainerDataTest &obj) {
-	//	if (data) dispose();
-	//	size_bytes = obj.size_bytes;
-	//	data = malloc(size_bytes);
-	//	memcpy(data, obj.data, obj.size_bytes);
-	//}
+	void moveTo(std::unique_ptr<_Ty> &obj) {
+		obj = std::move(data);
+	}
+
+	void copyFrom(const void* src, size_t src_size_bytes) {
+		if (data) dispose();
+		size_bytes = src_size_bytes;
+		data = malloc(size_bytes);
+		memcpy(data, src, size_bytes);
+	}
+	void copyFrom(AtomicContainerDataTest &obj) {
+		if (data) dispose();
+		size_bytes = obj.size_bytes;
+		data = malloc(size_bytes);
+		memcpy(data, obj.data, obj.size_bytes);
+	}
+	void dispose() {
+		if (data) { free(data); data = nullptr; }
+	}
+
 };
+
+void func(BaseClass &bc) {
+	std::cout << typeid(bc).name() << std::endl;
+	bc.getFrom();
+}
 
 void test_atomic_container() {
 
+	{
+		DerivedA a;
+		func(a);
+		DerivedB b;
+		func(b);
+	}
+
+	{
+		std::unique_ptr<char[]> ptr;
+		char* arr = new char[100];
+		strncpy(arr, "This is a sample string", strlen("This is a sample string"));
+		std::cout << "arr: " << arr << std::endl;
+
+		ptr = std::move(std::unique_ptr<char[]>(arr));
+		std::cout << "ptr: " << ptr.get() << std::endl;
+		std::cout << "arr: " << arr << std::endl;
+	}
+
+	{
+		std::unique_ptr<char[]> ptr;
+		char* arr = new char[100];
+		strncpy(arr, "This is a sample string", strlen("This is a sample string"));
+		std::cout << "arr: " << arr << std::endl;
+			
+		ptr = std::move(std::unique_ptr<char[]>(arr));
+		std::cout << "ptr: " << ptr.get() << std::endl;
+		std::cout << "arr: " << arr << std::endl;
+	}
 
 	cv::VideoCapture vc(0);
 	if (!vc.isOpened()) return;
@@ -285,7 +234,7 @@ void test_atomic_container() {
 		if (ptr.get()->empty()) continue;
 
 		AtomicContainerDataTest<cv::Mat> acdt;
-		acdt.getFrom(ptr, 0);
+		acdt.moveFrom(ptr);
 
 		if (ptr) cv::imshow("m", *ptr.get());
 		if (acdt.data) cv::imshow("t", *acdt.data.get());
@@ -296,8 +245,8 @@ void test_atomic_container() {
 
 void main()
 {
-	test_atomic_container();
-	return;
+	//test_atomic_container();
+	//return;
 	//read_saved_data();
 	//return;
 	//test();
@@ -316,7 +265,7 @@ void main()
 	record_container[0].set_cbk_func(std::bind(&VideoDataRecorder::frecorder, &vdr, 
 		std::placeholders::_1, std::placeholders::_2));
 
-	vdr.set_fname_root("sample_DataDesynchronizerGeneric");
+	vdr.set_fname_root("data\\sample_DataDesynchronizerGeneric");
 	vdr.set_size_image(cv::Size(640, 480));
 
 	double start = cv::getTickCount();

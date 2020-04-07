@@ -92,7 +92,7 @@ void test_recordcontainerfile_microbuffer() {
 	std::vector<vb::PtrMicrobuffer> vptr;
 	small_buffer[id].get_ptr_containers(100, vptr);
 	std::cout << "Transfer: " << vptr.size() << std::endl;
-	record_container[id].push(vptr);
+	record_container[id].push(vptr, false, -1);
 
 	// boost the saving if the request to save is false
 	// and complete the action
@@ -111,7 +111,7 @@ void test_recordcontainerfile_microbuffer() {
 	vptr.clear();
 	small_buffer[id].get_ptr_containers(100, vptr);
 	std::cout << "Transfer: " << vptr.size() << std::endl;
-	record_container[id].push(vptr);
+	record_container[id].push(vptr, false, -1);
 
 	// Clean size of the frame expire
 	small_buffer[id].clean(t_internal, save_frame_expire_time_sec);
@@ -141,7 +141,8 @@ void test_recordcontainerfile_mainbuffer() {
 		storedata::RecordContainerData rcd;
 		cv::Mat img(50, 50, CV_8UC3);
 		rcd.copyFrom(img.data, img.cols * img.rows * img.channels());
-		record_container[id].push("data\\" + std::to_string(i) + ".dat", rcd);
+		record_container[id].push("data\\" + std::to_string(i) + ".dat", 
+			rcd, false, -1);
 	}
 	record_container[id].stop();
 	record_container[id].wait_until_buffer_is_empty(1000, 5);

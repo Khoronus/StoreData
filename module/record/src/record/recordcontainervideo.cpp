@@ -33,7 +33,18 @@ RecordContainerVideo::RecordContainerVideo() {
 	num_elems_microbuffer_approx_ = 0;
 }
 //-----------------------------------------------------------------------------
-void RecordContainerVideo::push(const std::string &msg, RecordContainerData &rcd) {
+void RecordContainerVideo::push(
+	const std::string &msg, 
+	RecordContainerData &rcd,
+	bool do_use_max_size_buffer,
+	size_t max_size_buffer_container) {
+
+	// Too many elements in the buffer.
+	if (do_use_max_size_buffer &&
+		container_.size() > max_size_buffer_container) {
+		return;
+	}
+
 	{
 		std::lock_guard<std::mutex> lk(mtx_);
 		// Add the data
@@ -44,8 +55,17 @@ void RecordContainerVideo::push(const std::string &msg, RecordContainerData &rcd
 	cond_.notify_one();
 }
 //-----------------------------------------------------------------------------
-void RecordContainerVideo::push(std::vector<vb::PtrMicrobuffer> &vptr)
+void RecordContainerVideo::push(
+	std::vector<vb::PtrMicrobuffer> &vptr,
+	bool do_use_max_size_buffer,
+	size_t max_size_buffer_container)
 {
+	// Too many elements in the buffer.
+	if (do_use_max_size_buffer &&
+		container_microbuffer_.size() > max_size_buffer_container) {
+		return;
+	}
+
 	{
 		std::lock_guard<std::mutex> lk(mtx_);
 		// Add the data

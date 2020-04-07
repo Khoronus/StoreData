@@ -95,11 +95,18 @@ public:
 
 	/** @brief It push a new frame to save
 	*/
-	STOREDATA_RECORD_EXPORT void push(const std::string &fname, RecordContainerData &rcd);
+	STOREDATA_RECORD_EXPORT void push(
+		const std::string &fname, 
+		RecordContainerData &rcd,
+		bool do_use_max_size_buffer,
+		size_t max_size_buffer_container);
 
 	/** @brief It push a new microbuffer to save
 	*/
-	STOREDATA_RECORD_EXPORT void push(std::vector<vb::PtrMicrobuffer> &vptr);
+	STOREDATA_RECORD_EXPORT void push(
+		std::vector<vb::PtrMicrobuffer> &vptr,
+		bool do_use_max_size_buffer,
+		size_t max_size_buffer_container);
 
 	/** @brief It starts the thread
 	*/

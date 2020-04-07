@@ -118,7 +118,9 @@ void main()
 			// Add the record to save on a separate thread
 			storedata::RecordContainerData rcd0;
 			rcd0.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
-			record_container[0].push(fname, rcd0);
+			record_container[0].push(fname, rcd0, true, 0); // <- it allows 
+			                                                // only 1 frame 
+			                                                // buffering.
 			++num_frame_buffer;
 		}
 
@@ -136,7 +138,7 @@ void main()
 			// copy the microbuffer
 			if (bufferize_microbuffer) {
 				small_buffer_.get_ptr_containers(5, vptr);
-				record_container[0].push(vptr);
+				record_container[0].push(vptr, false, -1);
 			}
 			record_container[0].start();
 			break;

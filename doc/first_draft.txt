@@ -69,3 +69,13 @@ RecordContainerVideo : It creates a single video file (OpenCV xvid format .avi f
 RecordContainerFile (former RecordContainer) : It creates files. IMPORTANT: It saves a file for each pushed data
 
 These classes performs a desinchronization of a function.
+NEG: - Loss of event in real world
+     - Buffering can grow drastically
+     - Data is copied
+PRO: - Desinchronize synchronize events
+
+DataDesynchronizerGeneric with callback functions (usually in classes, like VideoDataRecorder).
+
+Real-Time recording with buffering (?)
+ - Thread A only capture
+ - Thread B only record (check if can record of bufferize)

@@ -180,11 +180,11 @@ void test_record_container_file() {
 			// Add the record to save on a separate thread
 			storedata::RecordContainerData rcd0, rcd1;
 			rcd0.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
-			record_container[0].push(fname, rcd0);
+			record_container[0].push(fname, rcd0, false, -1);
 			fname = "data\\F1_" + std::to_string(num_frame) + ".data";
 
 			rcd1.copyFrom(m.data, m.cols * m.rows * (m.step / m.cols));
-			record_container[0].push(fname, rcd1);
+			record_container[0].push(fname, rcd1, false, -1);
 			++num_frame;
 		}
 		std::cout << "Size: " << record_container[0].size_about() << " " << record_container[0].size_about_micro() << std::endl;

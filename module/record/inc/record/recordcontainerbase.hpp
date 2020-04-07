@@ -86,11 +86,18 @@ public:
 
 	/** @brief It push a new frame to save
 	*/
-	STOREDATA_RECORD_EXPORT virtual void push(const std::string &fname, RecordContainerData &rcd) = 0;
+	STOREDATA_RECORD_EXPORT virtual void push(
+		const std::string &fname, 
+		RecordContainerData &rcd,
+		bool do_use_max_size_buffer,
+		size_t max_size_buffer_container) = 0;
 
 	/** @brief It push a new microbuffer to save
 	*/
-	STOREDATA_RECORD_EXPORT virtual void push(std::vector<vb::PtrMicrobuffer> &vptr) = 0;
+	STOREDATA_RECORD_EXPORT virtual void push(
+		std::vector<vb::PtrMicrobuffer> &vptr,
+		bool do_use_max_size_buffer,
+		size_t max_size_buffer_container) = 0;
 
 	/** @brief It starts the thread
 	*/
