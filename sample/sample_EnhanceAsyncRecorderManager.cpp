@@ -179,7 +179,7 @@ int main(int argc, char *argv[], char *window_name)
 		return 0;
 	}
 	// Record the current webcam image
-	bool do_save_as_avi = false;
+	bool do_save_as_avi = true;
 	sample_record_async(do_save_as_avi);
 	//play_avi_v2("data\\2019_03_21_10_58_07.avi");
 	DerivateEARM dearm;

@@ -442,6 +442,7 @@ bool EnhanceAsyncRecorderManager::read_video(const std::string &fname,
 
 	// Check the video
 	bool write_img = true;
+	bool do_skip_frame = do_skip_first_frame;
 	if (vc.isOpened()) {
 		int num_frame = 0;
 		while (true)
@@ -451,6 +452,11 @@ bool EnhanceAsyncRecorderManager::read_video(const std::string &fname,
 			if (m.empty()) {
 				break;
 			}
+			// skip the first frame
+			if (do_skip_frame) {
+				do_skip_frame = false;
+				continue;
+			}
 			int x = data_block_offset, y = data_block_offset;
 
 			size_t len = 0;
@@ -459,9 +465,10 @@ bool EnhanceAsyncRecorderManager::read_video(const std::string &fname,
 				data_block_offset, sizeof(len), shared_buffer.get(), shared_buffer_size - 1, len);
 
 			// callback with the information
-			if (!get_read_data(m(cv::Rect(0, 0,
+			if (get_read_data(m(cv::Rect(0, 0,
 				tmp.cols, tmp.rows)),
-				shared_buffer.get(), shared_buffer_size - 1)) break;
+				shared_buffer.get(), shared_buffer_size - 1) !=
+				EARM_OK) break;
 
 			// in this example data is consider as a string (but it it can be 
 			// anything)
