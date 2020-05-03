@@ -34,8 +34,6 @@
 
 #include "record/record_headers.hpp"
 
-#include "UDPKomatsu2Arm.hpp"
-
 // ----------------------------------------------------------------------------
 namespace
 {

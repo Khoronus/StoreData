@@ -1,5 +1,4 @@
 #include "codify/codify.hpp"
-#include "UDPKomatsu2Arm.hpp"
 
 int data_block_size = 1;
 int data_block_offset = 1;
@@ -16,8 +15,6 @@ void read2(int argc, char* argv[]) {
 		std::cout << "Unable to open: " << argv[1] << std::endl;
 		return;
 	}
-
-	UDPKomatsu2Arm udp_komatsu_2arm;
 
 	cv::Mat tmp(2048, 2048, CV_8UC3);
 	//cv::Mat m_data_block(30, frame_width, CV_8UC3, cv::Scalar::all(0));
@@ -66,8 +63,6 @@ void read2(int argc, char* argv[]) {
 			// save the data about the robot pose (raw file)
             int size = 384;
 			myFile.write(reinterpret_cast<const char*>(&data[0]), size);
-			udp_komatsu_2arm.convert(reinterpret_cast<const char*>(&data[0]), 
-				size);
 			// show the image
 			cv::resize(m, m, cv::Size(512, 512));
 			cv::imshow("m", m);
