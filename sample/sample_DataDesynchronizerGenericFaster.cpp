@@ -61,9 +61,9 @@ public:
 
 
 		// Process the data
-		if (rcd->data) {
+		if (rcd->data()) {
 			// convert the binary in image
-			cv::Mat img = cv::Mat(size_image_, CV_8UC3, rcd->data);
+			cv::Mat img = cv::Mat(size_image_, CV_8UC3, rcd->data());
 			filevideo_push_frame(vw_, fname_root_ + ".avi", img);
 
 			// open a file with the frame information
@@ -74,7 +74,7 @@ public:
 			std::string timestamp =
 				storedata::DateTime::get_date_as_string() +
 				" " + std::to_string(cv::getTickCount());
-			fout_ << rcd->unique_msg_ << "|" << timestamp << std::endl;
+			fout_ << rcd->unique_msg() << "|" << timestamp << std::endl;
 		}
 	}
 
@@ -312,7 +312,6 @@ void main()
 	vdr.set_fname_root("data\\sample_DataDesynchronizerGenericFaster");
 	vdr.set_size_image(cv::Size(640, 480));
 
-	double start = cv::getTickCount();
 	bool continue_capture = true;
 	bool bufferize = false;
 	int num_frame = 0;

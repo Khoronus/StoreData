@@ -17,7 +17,7 @@
 *
 * @original author Alessandro Moro <alessandromoro.italy@gmail.com>
 * @bug No known bugs.
-* @version 0.2.0.0
+* @version 0.3.0.0
 *
 */
 
@@ -34,56 +34,39 @@ namespace storedata
 
 /** @brief Container data to transfer data between threads. It copies the data.
 */
-struct STOREDATA_BUFFER_EXPORT AtomicContainerDataFaster
+class AtomicContainerDataFaster
 {
-//	std::unique_ptr<void> data_Ty;
+public:
+
+	STOREDATA_BUFFER_EXPORT AtomicContainerDataFaster();
+
+	STOREDATA_BUFFER_EXPORT void set_unique_msg(const std::string &unique_msg);
+
+	STOREDATA_BUFFER_EXPORT void copyFrom(const void* src, size_t src_size_bytes);
+
+	STOREDATA_BUFFER_EXPORT void copyFrom(AtomicContainerDataFaster &obj);
+
+	STOREDATA_BUFFER_EXPORT void assignFrom(void* src, size_t src_size_bytes);
+
+	STOREDATA_BUFFER_EXPORT void assignFrom(AtomicContainerDataFaster &obj);
+
+	STOREDATA_BUFFER_EXPORT void dispose();
+
+	STOREDATA_BUFFER_EXPORT std::string unique_msg();
+
+	STOREDATA_BUFFER_EXPORT void* data();
+
+	STOREDATA_BUFFER_EXPORT size_t size_bytes();
+
+	STOREDATA_BUFFER_EXPORT bool safe_dispose();
+
+private:
+
 	// Associated unique message to the container data
 	std::string unique_msg_;
-	void* data;
-	size_t size_bytes;
-	bool safe_dispose;
-	AtomicContainerDataFaster() : data(nullptr) {}
-
-	void set_unique_msg(const std::string &unique_msg) {
-		unique_msg_ = unique_msg;
-	}
-	void copyFrom(const void* src, size_t src_size_bytes) {
-		if (data) dispose();
-		size_bytes = src_size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, src, size_bytes);
-		safe_dispose = true;
-	}
-	void copyFrom(AtomicContainerDataFaster &obj) {
-		if (data) dispose();
-		size_bytes = obj.size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, obj.data, obj.size_bytes);
-		safe_dispose = true;
-	}
-	void assignFrom(void* src, size_t src_size_bytes) {
-		if (data) dispose();
-		size_bytes = src_size_bytes;
-		data = src;
-		safe_dispose = false;
-	}
-	void assignFrom(AtomicContainerDataFaster &obj) {
-		if (data) dispose();
-		size_bytes = obj.size_bytes;
-		data = obj.data;
-		safe_dispose = false;
-	}
-	void dispose() {
-		if (safe_dispose && data) { free(data); data = nullptr; }
-	}
-
-	//void moveFrom(std::unique_ptr<void> &obj) {
-	//	data_Ty = std::move(obj);
-	//}
-	//void moveTo(std::unique_ptr<void> &obj) {
-	//	obj = std::move(data_Ty);
-	//}
-
+	void* data_;
+	size_t size_bytes_;
+	bool safe_dispose_;
 };
 
 } // namespace storedata

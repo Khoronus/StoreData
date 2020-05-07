@@ -93,7 +93,7 @@ void DataDesynchronizerGeneric::internal_thread() {
 			callback_func_(tuple.first, tuple.second);
 
 			// dispose the data
-			if (tuple.second.data) {
+			if (tuple.second.data()) {
 				tuple.second.dispose();
 			}
 		}

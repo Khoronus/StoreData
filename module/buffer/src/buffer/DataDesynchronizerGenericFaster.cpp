@@ -94,7 +94,7 @@ void DataDesynchronizerGenericFaster::internal_thread() {
 			callback_func_(element);
 
 			// dispose the data
-			if (element->data) {
+			if (element->data()) {
 				element->dispose();
 			}
 		}

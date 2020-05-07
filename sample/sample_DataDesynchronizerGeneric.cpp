@@ -61,9 +61,9 @@ public:
 
 
 		// Process the data
-		if (rcd.data) {
+		if (rcd.data()) {
 			// convert the binary in image
-			cv::Mat img = cv::Mat(size_image_, CV_8UC3, rcd.data);
+			cv::Mat img = cv::Mat(size_image_, CV_8UC3, rcd.data());
 			filevideo_push_frame(vw_, fname_root_ + ".avi", img);
 
 			// open a file with the frame information

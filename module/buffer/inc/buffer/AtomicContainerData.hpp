@@ -1,5 +1,5 @@
 /**
-* @file recordcontainergeneric.hpp
+* @file AtomicContainerData.hpp
 * @brief Header of the defined class
 *
 * @section LICENSE
@@ -33,26 +33,22 @@ namespace storedata
 
 /** @brief Container data to transfer data between threads. It copies the data.
 */
-struct STOREDATA_BUFFER_EXPORT AtomicContainerData
+class AtomicContainerData
 {
-	void* data;
-	size_t size_bytes;
-	AtomicContainerData() : data(nullptr) {}
-	void copyFrom(const void* src, size_t src_size_bytes) {
-		if (data) dispose();
-		size_bytes = src_size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, src, size_bytes);
-	}
-	void copyFrom(AtomicContainerData &obj) {
-		if (data) dispose();
-		size_bytes = obj.size_bytes;
-		data = malloc(size_bytes);
-		memcpy(data, obj.data, obj.size_bytes);
-	}
-	void dispose() {
-		if (data) { free(data); data = nullptr; }
-	}
+public:
+
+	STOREDATA_BUFFER_EXPORT AtomicContainerData();
+	STOREDATA_BUFFER_EXPORT void copyFrom(const void* src, size_t src_size_bytes);
+	STOREDATA_BUFFER_EXPORT void copyFrom(AtomicContainerData &obj);
+	STOREDATA_BUFFER_EXPORT void dispose();
+	STOREDATA_BUFFER_EXPORT void* data();
+	STOREDATA_BUFFER_EXPORT size_t size_bytes();
+
+private:
+
+	void* data_;
+	size_t size_bytes_;
+
 };
 
 } // namespace storedata
