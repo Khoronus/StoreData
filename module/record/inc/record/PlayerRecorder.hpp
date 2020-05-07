@@ -48,8 +48,14 @@ public:
 	}
 
 	STOREDATA_RECORD_EXPORT ~PlayerRecorder() {
-		fgm_.close();
+		close();
 	}
+
+	STOREDATA_RECORD_EXPORT void close() {
+		fgm_.close();
+		vgm_.close();
+	}
+
 
 	STOREDATA_RECORD_EXPORT void clear() {
 		fgp_.clear();

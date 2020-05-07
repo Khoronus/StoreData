@@ -103,21 +103,30 @@ bool PlayerRecorder::record_file(cv::Mat &curr, bool encoded, std::string &msg) 
 
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
-	int imagedatasize_bytes = 24; // IT MUST BE SAME LATER
-			                        // Cols, Rows, Channels, Data size, Message size
-	m_data[0] = std::vector<char>(size_img_data + size_msg_data + 
+	// The size of the data header.
+	int imagedatasize_bytes = sizeof(int) * 4 + sizeof(size_t) * 2; // IT MUST BE SAME LATER
+								  // Cols, Rows, Channels, Data size, Message size
+	m_data[0] = std::vector<char>(size_img_data + size_msg_data +
 		imagedatasize_bytes);
 
 	// Copy the data
 	int channels = curr.channels();
-	memcpy(&m_data[0][0], &codified, sizeof(int));
-	memcpy(&m_data[0][4], &curr.cols, sizeof(int));
-	memcpy(&m_data[0][8], &curr.rows, sizeof(int));
-	memcpy(&m_data[0][12], &channels, sizeof(int));
-	memcpy(&m_data[0][16], &size_img_data, sizeof(int));
-	memcpy(&m_data[0][20], &size_msg_data, sizeof(int));
-	memcpy(&m_data[0][24], data, size_img_data);
-	memcpy(&m_data[0][24 + size_img_data], &info_to_transmit[0], 
+	size_t byte_header_size = 0;
+	memcpy(&m_data[0][byte_header_size], &codified, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &curr.cols, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &curr.rows, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &channels, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &size_img_data, sizeof(size_t));
+	byte_header_size += sizeof(size_t);
+	memcpy(&m_data[0][byte_header_size], &size_msg_data, sizeof(size_t));
+	byte_header_size += sizeof(size_t);
+	memcpy(&m_data[0][byte_header_size], data, size_img_data);
+	byte_header_size += size_img_data;
+	memcpy(&m_data[0][byte_header_size], &info_to_transmit[0],
 		size_msg_data);
 	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
 	return true;
@@ -165,21 +174,29 @@ bool PlayerRecorder::record_file(
 	// Prepare the container for the data to transmit
 	std::map<int, std::vector<char> > m_data;
 	// The size of the data header.
-	int imagedatasize_bytes = 24; // IT MUST BE SAME LATER
+	int imagedatasize_bytes = sizeof(int) * 4 + sizeof(size_t) * 2; // IT MUST BE SAME LATER
 								  // Cols, Rows, Channels, Data size, Message size
 	m_data[0] = std::vector<char>(size_img_data + size_msg_data +
 		imagedatasize_bytes);
 
 	// Copy the data
 	int channels = curr.channels();
-	memcpy(&m_data[0][0], &codified, sizeof(int));
-	memcpy(&m_data[0][4], &curr.cols, sizeof(int));
-	memcpy(&m_data[0][8], &curr.rows, sizeof(int));
-	memcpy(&m_data[0][12], &channels, sizeof(int));
-	memcpy(&m_data[0][16], &size_img_data, sizeof(int));
-	memcpy(&m_data[0][20], &size_msg_data, sizeof(int));
-	memcpy(&m_data[0][24], data, size_img_data);
-	memcpy(&m_data[0][24 + size_img_data], &info_to_transmit[0],
+	size_t byte_header_size = 0;
+	memcpy(&m_data[0][byte_header_size], &codified, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &curr.cols, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &curr.rows, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &channels, sizeof(int));
+	byte_header_size += sizeof(int);
+	memcpy(&m_data[0][byte_header_size], &size_img_data, sizeof(size_t));
+	byte_header_size += sizeof(size_t);
+	memcpy(&m_data[0][byte_header_size], &size_msg_data, sizeof(size_t));
+	byte_header_size += sizeof(size_t);
+	memcpy(&m_data[0][byte_header_size], data, size_img_data);
+	byte_header_size += size_img_data;
+	memcpy(&m_data[0][byte_header_size], &info_to_transmit[0],
 		size_msg_data);
 	if (!fgm_.push_data_write_not_guarantee_can_replace(m_data)) { return false; }
 	return true;
@@ -299,7 +316,8 @@ void PlayerRecorder::unpack(
 void PlayerRecorder::data2data_type(char *data, int maxsize, 
 	std::vector< std::pair<cv::Mat, std::vector<char> > > &out)
 {
-	const int sizeofinfo = 24; // Expected information about the size
+	const int sizeofinfo = sizeof(int) * 4 + sizeof(size_t) * 2; // Expected 
+	                            // information about the size
 								// of the image
 	int pos = 0;
 	while (pos < maxsize) {
@@ -309,14 +327,15 @@ void PlayerRecorder::data2data_type(char *data, int maxsize,
 		if (pos + sizeofinfo < maxsize) {
 			memcpy(imginfo, &data[pos], sizeofinfo);
 		}
-		int codified = 0, cols = 0, rows = 0, channels = 0, imgsize = 0, 
-			msgsize = 0;
-		memcpy(&codified, &imginfo[0], 4);
-		memcpy(&cols, &imginfo[4], 4);
-		memcpy(&rows, &imginfo[8], 4);
-		memcpy(&channels, &imginfo[12], 4);
-		memcpy(&imgsize, &imginfo[16], 4);
-		memcpy(&msgsize, &imginfo[20], 4);
+		int codified = 0, cols = 0, rows = 0, channels = 0;
+		size_t imgsize = 0, msgsize = 0;
+		size_t byte_header_size = 0;
+		memcpy(&codified, &imginfo[byte_header_size], sizeof(int));
+		memcpy(&cols, &imginfo[byte_header_size], sizeof(int));
+		memcpy(&rows, &imginfo[byte_header_size], sizeof(int));
+		memcpy(&channels, &imginfo[byte_header_size], sizeof(int));
+		memcpy(&imgsize, &imginfo[byte_header_size], sizeof(size_t));
+		memcpy(&msgsize, &imginfo[byte_header_size], sizeof(size_t));
 		if (pos + sizeofinfo + imgsize + msgsize < maxsize)
 		{
 			cv::Mat m;

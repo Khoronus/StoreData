@@ -51,9 +51,15 @@ public:
 
 	STOREDATA_VIDEO_EXPORT EnhanceAsyncRecorderManager();
 
+	STOREDATA_VIDEO_EXPORT ~EnhanceAsyncRecorderManager();
+
 	STOREDATA_VIDEO_EXPORT void initialize_record(
 		const std::string &fname,
 		bool do_save_avi);
+
+	/** @brief It forces the closure of the current recording.
+	*/
+	STOREDATA_VIDEO_EXPORT void close();
 
 	/** @brief It resets the internal parameters
 	*/

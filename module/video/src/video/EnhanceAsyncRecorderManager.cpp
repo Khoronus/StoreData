@@ -37,6 +37,15 @@ EnhanceAsyncRecorderManager::EnhanceAsyncRecorderManager() {
 	fps_ = 30;
 	record_framerate_ = 30;
 	shared_buffer_size_ = 0;
+	raw_data_ = nullptr;
+}
+// ----------------------------------------------------------------------------
+EnhanceAsyncRecorderManager::~EnhanceAsyncRecorderManager() {
+	player_recorder_.close();
+	if (!raw_data_) {
+		delete[] raw_data_;
+		raw_data_ = nullptr;
+	}
 }
 // ----------------------------------------------------------------------------
 void EnhanceAsyncRecorderManager::initialize_record(
@@ -47,8 +56,7 @@ void EnhanceAsyncRecorderManager::initialize_record(
 	if (boost::filesystem::create_directory(dir)) {
 		std::cout << "[+] Root::sanity_check: create " <<
 			dir.string().c_str() << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "[-] Root::sanity_check: create " <<
 			dir.string().c_str() << std::endl;
 	}
@@ -64,13 +72,20 @@ void EnhanceAsyncRecorderManager::initialize_record(
 		player_recorder_.setup_file(fname, ".dat", 100000000, 100);
 	}
 	done_ = true;
-	raw_data_ = new unsigned char[2048];
+	if (!raw_data_) {
+		raw_data_ = new unsigned char[2048];
+	}
 	raw_data_size_ = 0;
 	is_initialize_recorder_ = false;
 	fname_video_path_ = fname;
 	source_scale_ = 1.0f;
 	is_object_initialized_ = true;
 	std::cout << "done" << std::endl;
+}
+// ----------------------------------------------------------------------------
+void EnhanceAsyncRecorderManager::close() {
+	player_recorder_.close();
+	is_initialize_recorder_ = false;
 }
 // ----------------------------------------------------------------------------
 void EnhanceAsyncRecorderManager::reset() {

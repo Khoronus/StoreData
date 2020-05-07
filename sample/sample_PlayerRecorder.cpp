@@ -108,7 +108,8 @@ int sample_PlayerRecorder_video_write() {
 	sources[0] = cv::Mat(480, 640, CV_8UC3);
 	pr.setup_video(sources, "data\\record_PlayerRecorder_video_", 30 * 10, 30, 30);
 
-	while (true) //Show the image captured in the window and repeat
+	bool do_continue = true;
+	while (do_continue) //Show the image captured in the window and repeat
 	{
 		cv::Mat curr;
 		vc >> curr;
@@ -119,7 +120,20 @@ int sample_PlayerRecorder_video_write() {
 
 		////////////////////////////////// Elaboration ////////////////////////////////////////
 		cv::imshow("curr", curr);
-		if (cv::waitKey(1) == 27) break;
+		char c = cv::waitKey(1);
+
+		switch (c) {
+		case 27:
+		case 'q':
+			do_continue = false;
+			break;
+		case '0':
+			{
+				pr.close();
+				pr.setup_video(sources, "data\\record_PlayerRecorder_video2_", 30 * 10, 30, 30);
+			}
+			break;
+		}
 	}
 	return 0;
 }
@@ -138,6 +152,7 @@ int main(int argc, char *argv[], char *window_name)
 	{
 		// record a video
 		sample_PlayerRecorder_file_write();
+
 		// Record a video and save some simple data
 		storedata::PlayerRecorder pr;
 		//global_fname = "2020_04_06_03_27_01";
