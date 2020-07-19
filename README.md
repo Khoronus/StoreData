@@ -23,7 +23,7 @@ The batch file is used to configures the location of the third party libraries.<
 Run batch files from folder configure\win in the order (1~2).<br/>
 If new third party libraries are installed (i.e. new version of boost), run "configure\win\900. clear cache.bat". Please, note that all the files in build folders are deleted.<br/>
 
-```<br/>
+```
 
 0. configure.bat<br/>
 Batch file to set the third party libraries location<br/>
@@ -34,7 +34,7 @@ It builds the solutions and creates the binary files.<br/>
 
 or by executing cmake from the root folder to compile with favourite compiler.<br/>
 
-```<br/>
+```
 
 ## Features
 
