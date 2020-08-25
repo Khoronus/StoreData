@@ -41,7 +41,8 @@ void RecordContainerVideo::push(
 
 	// Too many elements in the buffer.
 	if (do_use_max_size_buffer &&
-		container_.size() > max_size_buffer_container) {
+		container_.size() > (std::max)(static_cast<size_t>(0), 
+			max_size_buffer_container)) {
 		return;
 	}
 
