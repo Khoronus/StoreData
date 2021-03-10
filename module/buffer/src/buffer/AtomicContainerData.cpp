@@ -36,7 +36,7 @@ void AtomicContainerData::copyFrom(const void* src, size_t src_size_bytes) {
 	if (data_) dispose();
 	size_bytes_ = src_size_bytes;
 	data_ = malloc(size_bytes_);
-	memcpy(data_, src, size_bytes_);
+	std::memcpy(data_, src, size_bytes_);
 }
 //-----------------------------------------------------------------------------
 void AtomicContainerData::copyFrom(AtomicContainerData &obj) {

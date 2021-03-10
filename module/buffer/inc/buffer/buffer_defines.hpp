@@ -36,10 +36,18 @@
 
 #else // STOREDATADLL_USE_LIB != 1
 
+// https://stackoverflow.com/questions/59718402/getting-around-declspecdllimport-in-windows-to-linux-project-conversion
+#if defined(_WIN32) && defined(STOREDATA_BUFFER_EXPORT)
 #ifdef STOREDATABUFFERDLL
+// Compiling a Windows DLL
 #define STOREDATA_BUFFER_EXPORT __declspec(dllexport)
 #else
+// Using a Windows DLL
 #define STOREDATA_BUFFER_EXPORT __declspec(dllimport)
+#endif
+// Windows or Linux static library, or Linux so
+#else
+#    define STOREDATA_BUFFER_EXPORT
 #endif
 
 #endif // STOREDATADLL_USE_LIB

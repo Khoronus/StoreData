@@ -163,11 +163,11 @@ void RawRecorder::read_all_raw(const std::string &filename, int FPS) {
 		delete[] memblock;
 	}
 
-#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
+//#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
 	for (auto it = data_info.begin(); it != data_info.end(); it++)
-#else
-	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
-#endif		
+//#else
+	//for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
+//#endif		
 	{
 		char msg[1024];
 		for (int i = 0; i < it->size(); i++)
@@ -227,11 +227,11 @@ void RawRecorder::read_all_raw_compressed(const std::string &filename, int FPS) 
 	uLong uncomprLen = 5000000;
 	Byte* uncom = (Byte*)calloc((uInt)uncomprLen, 1);
 
-#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
+//#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
 	for (auto it = data_info.begin(); it != data_info.end(); it++)
-#else
-	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
-#endif		
+//#else
+//	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
+//#endif		
 	{
 		// uncompress
 		int err = uncompress(uncom, &uncomprLen, it->data(), 
@@ -296,11 +296,11 @@ void RawRecorder::read_all_raw_compressed(const std::string &filename, int FPS) 
 	free(uncom);
 #else
 
-#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
+//#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
 	for (auto it = data_info.begin(); it != data_info.end(); it++)
-#else
-	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
-#endif		
+//#else
+//	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
+//#endif		
 	{
 		// analyze the data
 		size_t num_items = 0;

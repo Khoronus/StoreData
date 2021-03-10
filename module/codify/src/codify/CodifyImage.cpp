@@ -103,7 +103,7 @@ void CodifyImage::image2data(cv::Mat &m, int &x, int &y, int k, int offset,
 	image2buffer(len, m, x, y, k, offset, data, maxlen);
 }
 //-----------------------------------------------------------------------------
-unsigned char CodifyImage::image2byte(cv::Mat &m) {
+unsigned char CodifyImage::image2byte(const cv::Mat &m) {
 	std::map<int, int> mm;
 	for (int y = 0; y < m.rows; ++y) {
 		for (int x = 0; x < m.cols; ++x) {

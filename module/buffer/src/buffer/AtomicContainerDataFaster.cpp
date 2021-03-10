@@ -39,7 +39,7 @@ void AtomicContainerDataFaster::copyFrom(const void* src,
 	if (data_) dispose();
 	size_bytes_ = src_size_bytes;
 	data_ = malloc(size_bytes_);
-	memcpy(data_, src, size_bytes_);
+	std::memcpy(data_, src, size_bytes_);
 	safe_dispose_ = true;
 }
 //-----------------------------------------------------------------------------

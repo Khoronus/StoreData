@@ -69,7 +69,7 @@ endif()
 
 ######################################################################
 # Options
-option (USE_ZLIB "Use the zlib library" ON)
+option (USE_ZLIB "Use the zlib library" OFF)
 option (USE_BUILD_AS_LIB "Build as lib (no dll)" OFF)
 option (USE_STATIC "Build as static library (/MT)" OFF)
 

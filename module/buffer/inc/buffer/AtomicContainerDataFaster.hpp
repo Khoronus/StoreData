@@ -17,7 +17,7 @@
 *
 * @original author Alessandro Moro <alessandromoro.italy@gmail.com>
 * @bug No known bugs.
-* @version 0.3.0.0
+* @version 0.3.1.0
 *
 */
 
@@ -25,6 +25,7 @@
 #ifndef STOREDATA_BUFFER_ATOMICCONTAINERDATAFASTER_HPP__
 #define STOREDATA_BUFFER_ATOMICCONTAINERDATAFASTER_HPP__
 
+#include <cstring>
 #include <string>
 #include <memory>
 #include "buffer_defines.hpp"

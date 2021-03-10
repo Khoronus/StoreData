@@ -17,7 +17,7 @@
 *
 * @oauthor Alessandro Moro <alessandromoro.italy@gmail.com>
 * @bug No known bugs.
-* @version 0.4.0.0
+* @version 0.4.1.0
 *
 */
 
@@ -136,7 +136,7 @@ private:
 		@param[in] m Source
 		@return The character with the maximum entries.
 	*/
-	static unsigned char image2byte(cv::Mat &m);
+	static unsigned char image2byte(const cv::Mat &m);
 
 	/** @brief It convert a char in an image block.
 
