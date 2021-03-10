@@ -37,7 +37,7 @@
 #else // STOREDATADLL_USE_LIB != 1
 
 // https://stackoverflow.com/questions/59718402/getting-around-declspecdllimport-in-windows-to-linux-project-conversion
-#if defined(_WIN32) && defined(STOREDATA_CODIFY_EXPORT)
+#if defined(_WIN32) && !defined(STOREDATA_CODIFY_EXPORT)
 #ifdef STOREDATACODIFYDLL
 // Compiling a Windows DLL
 #define STOREDATA_CODIFY_EXPORT __declspec(dllexport)

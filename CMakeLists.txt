@@ -26,7 +26,7 @@ project (${MAIN_PROJ_NAME})
 
 set(STOREDATA_VERSION_MAJOR 0 CACHE STRING "major version of storedata" FORCE)
 set(STOREDATA_VERSION_MINOR 14 CACHE STRING "minor version of storedata" FORCE)
-set(STOREDATA_VERSION_SUBMINOR 1 CACHE STRING "subminor version of storedata" FORCE)
+set(STOREDATA_VERSION_SUBMINOR 2 CACHE STRING "subminor version of storedata" FORCE)
 set(STOREDATA_VERSION_PATCH 0 CACHE STRING "patch version of storedata" FORCE)
 set(STOREDATA_VERSION "${STOREDATA_VERSION_MAJOR}.${STOREDATA_VERSION_MINOR}.${STOREDATA_VERSION_SUBMINOR}.${STOREDATA_VERSION_PATCH}"
                              CACHE STRING "version of storedata" FORCE)
