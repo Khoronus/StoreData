@@ -122,7 +122,7 @@ public:
 		@param[in] maxlen Maximum data size
 		@param[out] len length of the data saved
 		*/
-	STOREDATA_CODIFY_EXPORT static void image2data(cv::Mat &m, int &x, int &y, 
+	STOREDATA_CODIFY_EXPORT static void image2data(const cv::Mat &m, int &x, int &y, 
 		int k, int offset, size_t len_header, unsigned char* data, size_t maxlen,
 		size_t &len);
 
@@ -166,7 +166,7 @@ private:
 
 		@return It return the reconstructed char
 	*/
-	static unsigned char image_block2char(cv::Mat &m, int &x, int &y, int k,
+	static unsigned char image_block2char(const cv::Mat &m, int &x, int &y, int k,
 		int offset);
 
 	/** @brief It convert a buffer in an image.
@@ -212,7 +212,7 @@ private:
 		@param[out] msg The message to set 
 		@param[in] maxlen The maximum buffer size.
 		*/
-	static void image2buffer(size_t len, cv::Mat &m, int &x, int &y, int k,
+	static void image2buffer(size_t len, const cv::Mat &m, int &x, int &y, int k,
 		int offset, unsigned char* msg, size_t maxlen);
 
 };

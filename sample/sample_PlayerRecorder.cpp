@@ -143,7 +143,7 @@ int sample_PlayerRecorder_video_write() {
 
 /**	 Main code
 */
-int main(int argc, char *argv[], char *window_name)
+int main(int argc, char *argv[])
 {
 	create_folder("data");
 	create_folder("unpack");

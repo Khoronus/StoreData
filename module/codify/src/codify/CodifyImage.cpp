@@ -85,7 +85,7 @@ void CodifyImage::image2string(cv::Mat &m, int &x, int &y, int k, int offset,
 	delete[] msg_fin;
 }
 //-----------------------------------------------------------------------------
-void CodifyImage::image2data(cv::Mat &m, int &x, int &y, int k, int offset,
+void CodifyImage::image2data(const cv::Mat &m, int &x, int &y, int k, int offset,
 	size_t len_header, unsigned char* data, size_t maxlen, size_t &len) {
 	if (len_header > sizeof(len_header)) {
 		std::cout << "[e] header too big: " << __FILE__ << " " << __LINE__ <<
@@ -149,7 +149,7 @@ void CodifyImage::char2image_block(unsigned char c, cv::Mat &m, int &x, int &y,
 	}
 }
 //-----------------------------------------------------------------------------
-unsigned char CodifyImage::image_block2char(cv::Mat &m, int &x, int &y, 
+unsigned char CodifyImage::image_block2char(const cv::Mat &m, int &x, int &y, 
 	int k, int offset) {
 	
 	std::bitset<8> mybits;
@@ -214,7 +214,7 @@ void CodifyImage::buffer2image(const char* msg, size_t len, cv::Mat &m, int &x,
 	}
 }
 //-----------------------------------------------------------------------------
-void CodifyImage::image2buffer(size_t len, cv::Mat &m, int &x, int &y, int k,
+void CodifyImage::image2buffer(size_t len, const cv::Mat &m, int &x, int &y, int k,
 	int offset, unsigned char* msg, size_t maxlen) {
 	if (len <= maxlen) {
 		for (size_t i = 0; i < len; ++i) {
