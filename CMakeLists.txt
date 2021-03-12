@@ -81,7 +81,13 @@ find_package(OpenCV REQUIRED PATHS ${path_opencv})
 # Boost
 SET(BOOST_ROOT ${path_boost})
 SET(BOOST_LIBRARYDIR ${path_boost_lib})
-set(Boost_USE_STATIC_LIBS       OFF) # only find static libs
+if(UNIX)
+    set(Boost_USE_STATIC_LIBS       OFF) # only find static libs
+elseif(WIN32)
+    set(Boost_USE_STATIC_LIBS       ON) # only find static libs
+else()
+    message(FATAL_ERROR "Could not setup boost for this platform!")
+endif()
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost REQUIRED COMPONENTS system thread regex filesystem date_time serialization)
