@@ -1,3 +1,25 @@
+/* @file sample_volatile_timed_buffer.cpp
+ * @brief Main file with the example for the volatile timed buffer.
+ *
+ * @section LICENSE
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL PETER THORSON BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * @author Alessandro Moro <alessandromoro.italy@gmail.com>
+ * @bug No known bugs.
+ * @version 0.1.0.0
+ * 
+ */
+ 
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -65,10 +87,10 @@ void help() {
 }
 
 //-----------------------------------------------------------------------------
-void main()
+int main(int argc, char* argv[])
 {
 	cv::VideoCapture vc(0);
-	if (!vc.isOpened()) return;
+	if (!vc.isOpened()) return 0;
 
 	vb::VolatileTimedBuffer small_buffer_;
 
@@ -151,4 +173,6 @@ void main()
 			break;
 		}
 	}
+	
+	return 0;
 }

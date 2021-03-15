@@ -104,7 +104,8 @@ void test_FileGeneratorManagerAsync() {
 }
 
 //-----------------------------------------------------------------------------
-void main() {
+int main(int argc, char* argv[]) {
 	test_MemorizeFileManager();
 	test_FileGeneratorManagerAsync();
+	return 0;
 }
