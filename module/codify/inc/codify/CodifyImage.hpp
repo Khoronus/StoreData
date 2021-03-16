@@ -106,7 +106,7 @@ public:
 		@param[in] offset Distance between each point
 		@param[out] msg_out output string
 	*/
-	STOREDATA_CODIFY_EXPORT static void image2string(cv::Mat &m, int &x, 
+	STOREDATA_CODIFY_EXPORT static void image2string(const cv::Mat &m, int &x, 
 		int &y, int k, int offset, std::string &msg_out);
 
 	/** @brief It converts an image in a data frame.

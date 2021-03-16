@@ -223,7 +223,7 @@ void read() {
 
 
 //-----------------------------------------------------------------------------
-void main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
 	std::cout << "This project shows how some text is codified inside a ";
 	std::cout << "frame. All the size information are known for both writing ";
@@ -233,5 +233,5 @@ void main(int argc, char* argv[]) {
 	//return;
 	write();
 	read();
-	return;
+	return 0;
 }

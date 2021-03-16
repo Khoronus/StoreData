@@ -170,7 +170,7 @@ public:
 
 /**	 Main code
 */
-int main(int argc, char *argv[], char *window_name)
+int main(int argc, char *argv[])
 {
 	std::cout << "version_compiled: " << SD_VERSION_INT << std::endl;
 	std::cout << "version_dll: " << StoreDataVersion::get_version_int() << std::endl;
