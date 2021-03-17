@@ -17,15 +17,22 @@
 *
 * @original author Alessandro Moro
 * @bug No known bugs.
-* @version 0.1.0.0
+* @version 0.2.0.0
 *
 */
 
 #ifndef STOREDATA_VIDEO_ENHANCEASYNCRECORDERMANAGER_HPP__
 #define STOREDATA_VIDEO_ENHANCEASYNCRECORDERMANAGER_HPP__
 
-#define BOOST_BUILD
-#include <boost/filesystem.hpp>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <chrono>
+#include <thread>
+#include <filesystem>
+
+//#define BOOST_BUILD
+//#include <boost/filesystem.hpp>
 
 #include "video_defines.hpp"
 

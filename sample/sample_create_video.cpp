@@ -105,7 +105,8 @@ void test_VideoGeneratorManagerAsync() {
 }
 
 //-----------------------------------------------------------------------------
-void main() {
+int main(int argc, char* argv[]) {
 	test_MemorizeVideoManager();
 	test_VideoGeneratorManagerAsync();
+	return 0;
 }

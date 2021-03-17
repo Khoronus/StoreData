@@ -296,7 +296,8 @@ int FileGeneratorManagerAsync::push_data_write_not_guarantee_can_replace(
 		//boost::thread* thr = new boost::thread(
 		//	boost::bind(&FileGeneratorManagerAsync::procedure, this));
 		if (write_success) {
-			std::async(&FileGeneratorManagerAsync::procedure, this);
+			auto a = std::async(
+			    &FileGeneratorManagerAsync::procedure, this);
 		}
 
 		// used only for test to detect lost frames

@@ -214,8 +214,9 @@ void test_record_container_file() {
 
 
 //-----------------------------------------------------------------------------
-void main()
+int main(int argc, char* argv[])
 {
 	// There seems no point in using the microbuffer to save the files
 	test_record_container_file();
+	return 0;
 }

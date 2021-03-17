@@ -52,8 +52,8 @@ void EnhanceAsyncRecorderManager::initialize_record(
 	const std::string &fname,
 	bool do_save_avi) {
 	// sanity check
-	boost::filesystem::path dir("data");
-	if (boost::filesystem::create_directory(dir)) {
+	std::filesystem::path dir("data");
+	if (std::filesystem::create_directory(dir)) {
 		std::cout << "[+] Root::sanity_check: create " <<
 			dir.string().c_str() << std::endl;
 	} else {
