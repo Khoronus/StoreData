@@ -98,7 +98,7 @@ int record_raw() {
 
 /**	 Main code
 */
-int main(int argc, char *argv[], char *window_name)
+int main(int argc, char *argv[])
 {
 	create_folder("data_recordraw");
 	create_folder("unpack");

@@ -1,5 +1,5 @@
-/* @file main.cpp
- * @brief Main file with the example for the hog descriptor and visualization.
+/* @file sample_create_video.cpp
+ * @brief Example to create video asynchronously.
  *
  * @section LICENSE
  *

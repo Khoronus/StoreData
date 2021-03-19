@@ -1,5 +1,5 @@
-/* @file main.cpp
- * @brief Main file with the example for the hog descriptor and visualization.
+/* @file sample_logger.cpp
+ * @brief Main logger example file.
  *
  * @section LICENSE
  *
@@ -51,7 +51,7 @@ void test_logger () {
 
 /**	 Main code
 */
-int main(int argc, char *argv[], char *window_name)
+int main(int argc, char *argv[])
 {
 	test_logger();
 	
