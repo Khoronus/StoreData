@@ -1,5 +1,5 @@
 /* @file sample_rawrecord.cpp
- * @brief Main file with the example for the hog descriptor and visualization.
+ * @brief Example of recording data in raw format.
  *
  * @section LICENSE
  *
@@ -16,7 +16,7 @@
  * 
  * @author Alessandro Moro <alessandromoro.italy@gmail.com>
  * @bug No known bugs.
- * @version 0.1.0.0
+ * @version 0.1.1.0
  * 
  */
 
@@ -24,11 +24,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <filesystem>
 
 #include <opencv2/opencv.hpp>
 
-#define BOOST_BUILD
-#include <boost/filesystem.hpp>
+//#define BOOST_BUILD
+//#define BOOST_NO_CXX11_SCOPED_ENUMS
+//#include <boost/filesystem.hpp>
+//#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "record/record_headers.hpp"
 
@@ -39,12 +42,11 @@ namespace
 /** @brief It creates a folder if necessary
 */
 void create_folder(const std::string &folder) {
-	boost::filesystem::path dir(folder);
-	if (boost::filesystem::create_directory(dir)) {
+	std::filesystem::path dir(folder);
+	if (std::filesystem::create_directory(dir)) {
 		std::cout << "[+] Root::sanity_check: create " <<
 			dir.string().c_str() << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "[-] Root::sanity_check: create " <<
 			dir.string().c_str() << std::endl;
 	}

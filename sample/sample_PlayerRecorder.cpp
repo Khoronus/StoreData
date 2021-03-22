@@ -1,5 +1,5 @@
-/* @file main.cpp
- * @brief Main file with the example for the hog descriptor and visualization.
+/* @file sample_PlayerRecorder.cpp
+ * @brief Example of recorder and player.
  *
  * @section LICENSE
  *
