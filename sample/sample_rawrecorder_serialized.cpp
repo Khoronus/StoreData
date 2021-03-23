@@ -16,7 +16,7 @@
  * 
  * @author Alessandro Moro <alessandromoro.italy@gmail.com>
  * @bug No known bugs.
- * @version 0.1.0.0
+ * @version 0.1.1.0
  * 
  */
 
@@ -287,16 +287,17 @@ void rawrecorder_read_raw(const std::string &filename) {
 	std::cout << "Found: " << data_info.size() << " frames" << std::endl;
 
 	int idx = 0;
-#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
-	for (auto it = data_info.begin(); it != data_info.end(); it++)
-#else
-	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
-#endif		
+//#if _MSC_VER && !__INTEL_COMPILER && (_MSC_VER > 1600)
+//	for (auto it = data_info.begin(); it != data_info.end(); it++)
+//#else
+//	for (std::vector< std::vector<char> >::const_iterator it = data_info.begin(); it != data_info.end(); it++)
+//#endif		
+	for (auto &&it : data_info)
 	{
-		std::cout << idx << " => " << it->size() << std::endl;
+		std::cout << idx << " => " << it.size() << std::endl;
 
 		ObjectToSerialize obj;
-		std::string serial_str(it->begin(), it->end());
+		std::string serial_str(it.begin(), it.end());
 		ContainerSerializedIO::from_string(serial_str, obj);
 		std::cout << obj.msg() << std::endl;
 		cv::imshow("img", obj.img());
@@ -311,7 +312,7 @@ void rawrecorder_read_raw(const std::string &filename) {
 
 /**	 Main code
 */
-int main(int argc, char *argv[], char *window_name)
+int main(int argc, char *argv[])
 {
 	std::cout << "It records a serialized data (boost) into a file" << std::endl;
 	// record a video with a raw data saver
