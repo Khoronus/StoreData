@@ -16,7 +16,7 @@
  * 
  * @author Alessandro Moro <alessandromoro.italy@gmail.com>
  * @bug No known bugs.
- * @version 0.1.0.0
+ * @version 0.1.1.0
  * 
  */
 
@@ -26,9 +26,6 @@
 #include <vector>
 
 #include <opencv2/opencv.hpp>
-
-#define BOOST_BUILD
-#include <boost/filesystem.hpp>
 
 #include "buffer/buffer_headers.hpp"
 #include "record/record_headers.hpp"
@@ -152,7 +149,7 @@ void test_recordcontainerfile_mainbuffer() {
 
 /**	 Main code
 */
-int main(int argc, char *argv[], char *window_name)
+int main(int argc, char *argv[])
 {
 	test_recordcontainerfile_microbuffer();
 	test_recordcontainerfile_mainbuffer();
