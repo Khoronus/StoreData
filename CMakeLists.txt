@@ -69,7 +69,7 @@ endif()
 
 ######################################################################
 # Options
-option (USE_ZLIB "Use the zlib library" OFF)
+option (USE_ZLIB "Use the zlib library" ON)
 option (USE_BUILD_AS_LIB "Build as lib (no dll)" OFF)
 option (USE_STATIC "Build as static library (/MT)" OFF)
 
@@ -127,10 +127,19 @@ SET( PROJ_INCLUDES_ZLIB
     "${CMAKE_BINARY_DIR}/zlib-src"
     "${CMAKE_BINARY_DIR}/zlib-build"
 )
+if (MSVC)
 SET( PROJ_LIBRARIES_ZLIB
     debug "${CMAKE_BINARY_DIR}/zlib-build/Debug/zlibd.lib"
     optimized "${CMAKE_BINARY_DIR}/zlib-build/Release/zlib.lib"
 )
+endif (MSVC)
+if (UNIX)
+SET( PROJ_LIBRARIES_ZLIB
+    debug "${CMAKE_BINARY_DIR}/zlib-build/libz.so"
+    optimized "${CMAKE_BINARY_DIR}/zlib-build/libz.so"
+)
+endif (UNIX)
+
 else()
 set (USE_LIB_ZLIB 0)
 endif (USE_ZLIB)
