@@ -1,0 +1,2 @@
+D:\workspace\programs\ThirdPartyLib\cmn-StoreData\build\StoreData.sln
+D:\workspace\programs\ThirdPartyLib\cmn-StoreData\build\INSTALL.vcxproj
