@@ -1,2 +1,2 @@
-cd "D:\workspace\programs\ThirdPartyLib\cmn-StoreData"
+cd "%location%"
 call create_sln.bat
