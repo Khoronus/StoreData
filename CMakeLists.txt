@@ -27,7 +27,7 @@ file(READ "${pt_location_global}" pt_conf_global)
 
 ######################################################################
 # Read the path configuration file (local)
-set(path_local_cfg "../configure/path_configuration.txt")
+set(path_local_cfg "${CMAKE_SOURCE_DIR}/configure/path_configuration.txt")
 if (EXISTS ${path_local_cfg})
   file(READ ${path_local_cfg} pt_conf)
   message(STATUS "[+] open:${path_local_cfg}")
