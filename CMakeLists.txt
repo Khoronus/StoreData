@@ -139,7 +139,7 @@ endif()
 # 3rdparty Libraries
 include(DownloadProject.cmake)
 download_project(PROJ              zlib
-                 URL      https://zlib.net/zlib1213.zip
+                 URL      https://zlib.net/zlib131.zip
                  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 
